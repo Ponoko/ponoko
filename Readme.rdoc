@@ -5,6 +5,10 @@ The Ponoko[http://www.ponoko.com] gem enables Ruby developers to access the
 
 Developer resources can be found http://www.ponoko.com/app-gateway/developer-resources
 
+== Install
+
+
+
 == Usage
 
 Ponoko requires OAuth for authentication so the first thing you need are the OAuth keys. 
@@ -64,3 +68,8 @@ the return data in nice Ruby objects.
 High level API calls will make calls to the Ponoko servers only if necessary, ie.the 
 information hasn't already been fetched. Though you can force a fetch from the servers by 
 using the bang ('!') versions of the calls.
+
+---
+
+For support and feedback on this gem and/or the Ponoko API visit 
+http://support.ponoko.com/categories/10441-developer-program
