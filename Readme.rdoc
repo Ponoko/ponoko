@@ -9,7 +9,7 @@ Developer resources can be found http://www.ponoko.com/app-gateway/developer-res
 
 Ponoko requires OAuth for authentication so the first thing you need are the OAuth keys. 
 You can get your consumer keys and an access token for you own account by signing up to
-the developer program at the {Ponoko website}[]
+the developer program at the {Ponoko website}[http://www.ponoko.com/app-gateway/getting-started]
 
 Then you need to decide which API interface you want to use. The gem provides two
 interfaces to the API.
@@ -20,7 +20,7 @@ For use when you have an ORM, framework or pre-exsiting classes that you want to
 Ponoko data into.
 
 The API consists of a number of methods that map to the methods exposed by the Ponoko web
-API eg, get_material_catlogue, get_products, post_order etc. These methods return hashes 
+API eg, get_material_catalogue, get_products, post_order etc. These methods return hashes 
 of the API responses.
 
 First create a PonokoAPI object;
@@ -61,6 +61,6 @@ the return data in nice Ruby objects.
   my_order.status
   ...
   
-High level API calls will only make calls to the Ponoko servers only if necessary, ie.
-the information hasn't already been fetched. Though you can force a fecth from the servers
-by using the bang ('!') versions of the calls.
+High level API calls will make calls to the Ponoko servers only if necessary, ie.the 
+information hasn't already been fetched. Though you can force a fetch from the servers by 
+using the bang ('!') versions of the calls.
