@@ -1,31 +1,66 @@
 = Ponoko
 
+The Ponoko[http://www.ponoko.com] gem enables Ruby developers to access the 
+{Ponoko Personal Factory API}[http://www.ponoko.com/app-gateway/developer-program]
+
+Developer resources can be found http://www.ponoko.com/app-gateway/developer-resources
+
+== Usage
+
+Ponoko requires OAuth for authentication so the first thing you need are the OAuth keys. 
+You can get your consumer keys and an access token for you own account by signing up to
+the developer program at the {Ponoko website}[]
+
+Then you need to decide which API interface you want to use. The gem provides two
+interfaces to the API.
+
 === Low level API
 
-For use when you have an ORM, framework or pre-exsiting classes that you need to load the 
+For use when you have an ORM, framework or pre-exsiting classes that you want to load the 
 Ponoko data into.
 
 The API consists of a number of methods that map to the methods exposed by the Ponoko web
-API eg,
+API eg, get_material_catlogue, get_products, post_order etc. These methods return hashes 
+of the API responses.
 
-  get_products               #=>
-  post_order                 #=>
+First create a PonokoAPI object;
 
-These methods return hashes of the API responses.
+  ponoko = Ponoko::OAuthAPI.new env:             :sandbox,
+                                consumer_key:    'my_consumer_key', 
+                                consumer_secret: 'my_consumer_secret',
+                                access_token:    'my_access_token', 
+                                access_secret:   'my_access_secret'
+
+Then you can can use this object to interact with Ponoko;
+
+  nodes = ponoko.get_nodes
+  material_catalogue = ponoko.get_material_catalogue nodes.first['key']
+  ...
+  my_order = ponoko.get_order 'my_order_reference'
+  ponoko.get_order_status 'my_order_reference'
+  ...
+
+All low level methods will call to Ponoko's servers
 
 === High Level API
 
 This is more suited to when you are writing a script or application and you want to use 
 Ruby objects to represent the Ponoko data. It uses the Low Level API underneath but wraps
-the return data in nice Ruby objects, eg.
+the return data in nice Ruby objects.
 
-  Product.get!               #=>
+  Ponoko.api = Ponoko::OAuthAPI.new env:             :sandbox,
+                                    consumer_key:    'my_consumer_key', 
+                                    consumer_secret: 'my_consumer_secret',
+                                    access_token:    'my_access_token', 
+                                    access_secret:   'my_access_secret'
+
+  nodes = Node.get!
+  material_catalogue = nodes.first.material_catalogue
+  ...
+  my_order = Order.get! 'my_order_reference'
+  my_order.status
+  ...
   
-  Order.send!                #=> 
-
----
-
-=== OAUth
-
-
-unskip the test_client tests for full coverage before committing
+High level API calls will only make calls to the Ponoko servers only if necessary, ie.
+the information hasn't already been fetched. Though you can force a fecth from the servers
+by using the bang ('!') versions of the calls.
