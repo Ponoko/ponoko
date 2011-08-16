@@ -1,0 +1,31 @@
+= Ponoko
+
+=== Low level API
+
+For use when you have an ORM, framework or pre-exsiting classes that you need to load the 
+Ponoko data into.
+
+The API consists of a number of methods that map to the methods exposed by the Ponoko web
+API eg,
+
+  get_products               #=>
+  post_order                 #=>
+
+These methods return hashes of the API responses.
+
+=== High Level API
+
+This is more suited to when you are writing a script or application and you want to use 
+Ruby objects to represent the Ponoko data. It uses the Low Level API underneath but wraps
+the return data in nice Ruby objects, eg.
+
+  Product.get!               #=>
+  
+  Order.send!                #=> 
+
+---
+
+=== OAUth
+
+
+unskip the test_client tests for full coverage before committing
