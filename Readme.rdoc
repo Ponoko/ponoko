@@ -69,7 +69,14 @@ High level API calls will make calls to the Ponoko servers only if necessary, ie
 information hasn't already been fetched. Though you can force a fetch from the servers by 
 using the bang ('!') versions of the calls.
 
+=== To Do
+
+ * Use the Money gem, maybe.
+ * Improve exception messages.
+ * Add the new API methods.
+
 ---
+
 
 For support and feedback on this gem and/or the Ponoko API visit 
 http://support.ponoko.com/categories/10441-developer-program
