@@ -286,7 +286,7 @@ module Ponoko
     
     def material_catalogue!
       materials_date = materials_updated_at
-      update!
+      update! # update self from server
 
       if @material_catalogue.nil? || materials_updated_at > materials_date
         resp = Ponoko::api.get_material_catalogue key

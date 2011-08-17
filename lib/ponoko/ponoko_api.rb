@@ -11,8 +11,8 @@ module Ponoko
   class PonokoAPI
     PONOKO_API_PATH = '/services/api/v2/'
 
-    def initialize client = nil, env = :sandbox
-      @client = client.nil? ? self : client
+    def initialize client, env = :sandbox
+      @client = client
 
       @base_uri = case env
         when :test
