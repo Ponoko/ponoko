@@ -30,12 +30,16 @@ class Test_Products < MiniTest::Unit::TestCase
     assert_equal "xxx", product.name
     assert_equal "8bf834a59b8f36091d86faa27c2dd4bb", product.key
     assert_equal "product_ref", product.ref
-
-    assert_equal 1, product.designs.length
-    assert_equal "6bb50fd03269012e3526404062cdb04a", product.designs.first.material_key
-    assert_equal "bottom_new.stl", product.designs.first.filename
+    assert_equal 16.02, product.making_cost
+    assert_equal 2.84, product.materials_cost
     assert product.materials_available?
 
+    assert_equal 1, product.designs.length
+    design = product.designs.first
+    assert_equal "6bb50fd03269012e3526404062cdb04a", design.material_key
+    assert_equal "bottom_new.stl", design.filename
+    assert_equal 18.86, design.total_cost
+    assert_equal 0, design.material_cost
   end
 
   def test_make_a_product_missing_design
