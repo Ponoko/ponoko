@@ -6,7 +6,6 @@ class Test_Orders < MiniTest::Unit::TestCase
 
     @test_api = MiniTest::Mock.new
     Ponoko.api = @test_api
-    
   end
   
   def test_get_orders
@@ -145,7 +144,6 @@ class Test_Orders < MiniTest::Unit::TestCase
   end
 
   def test_bump_order_state
-    @test_api.expect(:base_uri, URI.parse('http://sandbox.ponoko.com'), [])
     @test_api.expect :step_order, make_resp(:bump_order), ['order_key']
 
     order = Ponoko::Order.new 'key' => 'order_key'
@@ -153,26 +151,13 @@ class Test_Orders < MiniTest::Unit::TestCase
     Ponoko::Sandbox::step_order order
 
     @test_api.verify
-
     assert_equal "order_key", order.key
     refute order.shipped?
     assert_equal "design_checked", order.status
   end
   
-  def test_bump_order_state_not_on_sandbox
-    @test_api.expect :base_uri, URI.parse('http://www.ponoko.com'), []
-
-    order = Ponoko::Order.new 'key' => 'order_key'
-    
-    assert_raises Ponoko::PonokoAPIError do
-      Ponoko::Sandbox::step_order order
-    end
-    
-    @test_api.verify
-  end
-
   def test_order_status
-    @test_api.expect(:get_order_status, make_resp(:status), ['order_key'])
+    @test_api.expect :get_order_status, make_resp(:status), ['order_key']
 
     order = Ponoko::Order.new 'key' => 'order_key'    
     order.status!

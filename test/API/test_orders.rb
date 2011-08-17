@@ -107,6 +107,16 @@ class Test_API_Orders < MiniTest::Unit::TestCase
     assert_equal [{"name"=>"design_checked", "completed_at"=>"2011/01/01 12:00:00 +0000"}], order['events']
   end
   
+  def test_bump_order_state_not_on_sandbox
+    ponoko = Ponoko::PonokoAPI.new @test_auth, :production
+    
+    assert_raises Ponoko::PonokoAPIError do
+      ponoko.step_order 'order_key'
+    end
+    
+    @test_auth.verify
+  end
+  
   def test_order_status
     @test_auth.expect(:get, @api_responses[:status], ['orders/status/order_key'])
 

@@ -59,6 +59,8 @@ module Ponoko
     end
     
     def step_order key
+      raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
+
       resp = @client.get "orders/trigger-next-event/#{key}"
       handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)

@@ -14,7 +14,6 @@ module Ponoko
   
   class Sandbox
     def self.step_order order
-      raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless Ponoko::api.base_uri.host =~ /sandbox/
       resp = Ponoko::api.step_order order.key
       order.update resp['order']
     end
@@ -153,12 +152,6 @@ module Ponoko
     attr_accessor :type, :weight, :color, :thickness, :name, :width, :material_type
     attr_accessor :length, :kind
     attr_accessor :updated_at
-    
-    def xto_s
-      # FIXME make this nicer eg
-      # "3D Printed, 3D Printed, Superfine plastic, Superfine plastic, Superfine plastic -  x , "
-      "#{@kind}, #{@name}, #{@color}, #{@thickness}, #{@type} - #{@length} x #{@width}, #{@weight}"
-    end
     
     def to_params
       key
