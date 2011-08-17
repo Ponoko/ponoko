@@ -55,7 +55,7 @@ class Test_Products < MiniTest::Unit::TestCase
     file = File.new(File.dirname(__FILE__) + "/Fixtures/small.svg")
     @test_api.expect :post_product, 
                       make_resp(:post_product_200), 
-                      [{"product_ref" => "product_ref", "name"=>"Product", "description"=>"This is a product description", "designs"=>[{"uploaded_data" => file, "ref"=>"42", "material_key"=>"6bb50fd03269012e3526404062cdb04a"}]}]
+                      [{"ref" => "product_ref", "name"=>"Product", "description"=>"This is a product description", "designs"=>[{"uploaded_data" => file, "ref"=>"42", "material_key"=>"6bb50fd03269012e3526404062cdb04a"}]}]
 
     product = Ponoko::Product.new 'ref' => 'product_ref', 'name' => 'Product', 'description' => 'This is a product description'
 

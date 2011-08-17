@@ -102,7 +102,7 @@ module Ponoko
     
     def to_params
       raise Ponoko::PonokoAPIError, "Product must have a Design." if designs.empty?
-      {ref => ref, 'name' => name, 'description' => description, 'designs' => @designs.to_params}
+      {'ref' => ref, 'name' => name, 'description' => description, 'designs' => @designs.to_params}
     end
     
     def making_cost
