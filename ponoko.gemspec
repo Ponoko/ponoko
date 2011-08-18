@@ -1,5 +1,8 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
+
+require 'rake'
+
+$LOAD_PATH << File.expand_path(File.dirname(__FILE__) + "/lib")
 require "ponoko/version"
 
 Gem::Specification.new do |s|
@@ -16,8 +19,6 @@ Gem::Specification.new do |s|
   s.add_dependency "oauth"
   s.add_development_dependency "simplecov"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test}/*`.split("\n")
-  s.require_paths = ["lib"]
-  
+  s.files = FileList['lib/**/*.rb', '[A-Z]*', 'test/**/*'].to_a  
+
 end
