@@ -86,7 +86,7 @@ module Ponoko
     end    
 
     def designs= designs
-      @designs = []
+      @designs.clear
       designs.each do |d|
         add_designs Design.new(d)
       end
