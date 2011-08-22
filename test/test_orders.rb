@@ -36,8 +36,13 @@ class Test_Orders < MiniTest::Unit::TestCase
   end
 
   def test_address_to_hash
-    address = Ponoko::Address.new 'John', 'Brown', '27 Dixon Street', 'Te Aro', 'Wellington', 'na', '6021', 'New Zealand', '045678910'
+    address = Ponoko::Address[{"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}]
     assert_equal({"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}, address.to_params)
+    
+=begin
+    assert_equal "John", address.first_name
+    assert_equal "Te Aro", address.address_line_2
+=end
   end
   
   def test_shipping_options
@@ -54,7 +59,7 @@ class Test_Orders < MiniTest::Unit::TestCase
     order.add_product product1, 1
     order.add_product product2, 99
     
-    order.delivery_address = Ponoko::Address.new 'John', 'Brown', '27 Dixon Street', 'Te Aro', 'Wellington', 'na', '6021', 'New Zealand', '045678910'
+    order.delivery_address = {"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}
 
     shipping_options = order.shipping_options!
 
@@ -79,7 +84,7 @@ class Test_Orders < MiniTest::Unit::TestCase
   end
   
   def test_make_an_order_with_no_products
-    address = Ponoko::Address.new 'John', 'Brown', '27 Dixon Street', 'Te Aro', 'Wellington', 'na', '6021', 'New Zealand', '045678910'
+    address = {"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}
     order = Ponoko::Order.new 'delivery_address' => address,  'shipping_option_code' => 'ups_ground'
     
     assert_raises Ponoko::PonokoAPIError do
@@ -98,7 +103,7 @@ class Test_Orders < MiniTest::Unit::TestCase
   end
   
   def test_make_an_order_with_no_shipping_option
-    address = Ponoko::Address.new 'John', 'Brown', '27 Dixon Street', 'Te Aro', 'Wellington', 'na', '6021', 'New Zealand', '045678910'
+    address = {"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}
 
     order = Ponoko::Order.new 'delivery_address' => address
     product = Ponoko::Product.new
@@ -114,7 +119,7 @@ class Test_Orders < MiniTest::Unit::TestCase
                      make_resp(:make_200),
                      [{"ref"=>"order_ref", "products"=>[{"key"=>"product_key", "quantity"=>"99"}], "shipping_option_code"=>"ups_ground", "delivery_address"=>{"first_name"=>"John", "last_name"=>"Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}}])
 
-    address = Ponoko::Address.new 'John', 'Brown', '27 Dixon Street', 'Te Aro', 'Wellington', 'na', '6021', 'New Zealand', '045678910'
+    address = {"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}
 
     order = Ponoko::Order.new 'ref' => 'order_ref', 'delivery_address' => address, 'shipping_option_code' => 'ups_ground'
     product = Ponoko::Product.new 'key' => "product_key"

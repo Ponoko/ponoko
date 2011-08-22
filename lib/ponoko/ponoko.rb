@@ -158,6 +158,8 @@ module Ponoko
     end
   end
   
+  class Address < Hash; end
+=begin
   class Address
     attr_accessor :first_name, :last_name, :address_line_1, :address_line_2, :city
     attr_accessor :state, :zip_or_postal_code, :country, :phone_number
@@ -184,6 +186,8 @@ module Ponoko
       h
     end
   end
+
+=end
     
   class Order < Base
     attr_accessor :shipped, :delivery_address, :events, :shipping_option_code

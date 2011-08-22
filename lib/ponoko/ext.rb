@@ -22,6 +22,10 @@ class Hash
   def to_query key = nil
     collect {|k, v| v.to_query(key ? "#{key}[#{k}]" : k)}.flatten
   end
+  
+  def to_params
+    self
+  end  
 end
 
 class String
