@@ -95,6 +95,41 @@ module Ponoko
       JSON.parse(resp.body)      
     end
     
+    def add_image params
+      boundary = "arandomstringofletters"
+      q = params.to_multipart.collect do |p|
+        '--' + boundary + "\r\n" + p
+      end.join('') + "--" + boundary + "--\r\n"
+
+      resp = @client.post "products/add_image", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def add_assembly_instructions params
+      boundary = "arandomstringofletters"
+      q = params.to_multipart.collect do |p|
+        '--' + boundary + "\r\n" + p
+      end.join('') + "--" + boundary + "--\r\n"
+
+      resp = @client.post "products/add_asembly", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def add_hardware params
+      q = params.to_query.collect do |p|
+        p.collect {|k,v| "#{k}=#{v}"}
+      end.flatten.join '&'
+
+      resp = @client.post "products/add_hardware", q
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
     def handle_error resp
       error = JSON.parse resp.body
       raise PonokoAPIError, error["error"]["message"]

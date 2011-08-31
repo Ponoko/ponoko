@@ -6,7 +6,6 @@ class Test_Products < MiniTest::Unit::TestCase
 
     @test_api = MiniTest::Mock.new
     Ponoko.api = @test_api
-
   end
   
   def test_get_products
@@ -76,6 +75,28 @@ class Test_Products < MiniTest::Unit::TestCase
     assert_equal 1, product.designs.length
     assert_equal 16.02, product.designs.first.making_cost
 
+  end
+  
+  def test_add_image
+    product.add_image file, true
+    product.add_image file
+    product.save!
+
+    @test_api.verify
+  end
+  
+  def test_add_assembly_instructions
+    product.add_assembly_instructions file
+    product.save!
+
+    @test_api.verify
+  end
+  
+  def test_add_hardware
+    product.add_hardware sku, quantity
+    product.save!
+
+    @test_api.verify
   end
   
 end

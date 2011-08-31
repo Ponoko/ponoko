@@ -39,10 +39,8 @@ class Test_Orders < MiniTest::Unit::TestCase
     address = Ponoko::Address[{"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}]
     assert_equal({"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}, address.to_params)
     
-=begin
-    assert_equal "John", address.first_name
-    assert_equal "Te Aro", address.address_line_2
-=end
+#     assert_equal "John", address.first_name
+#     assert_equal "Te Aro", address.address_line_2
   end
   
   def test_shipping_options

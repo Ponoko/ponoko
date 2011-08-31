@@ -159,35 +159,6 @@ module Ponoko
   end
   
   class Address < Hash; end
-=begin
-  class Address
-    attr_accessor :first_name, :last_name, :address_line_1, :address_line_2, :city
-    attr_accessor :state, :zip_or_postal_code, :country, :phone_number
-    
-    def initialize first_name, last_name, address_line_1, address_line_2, city, state, zip_or_postal_code, country, phone_number
-      @first_name = first_name
-      @last_name = last_name
-      @address_line_1 = address_line_1
-      @address_line_2 = address_line_2
-      @city = city
-      @state = state
-      @zip_or_postal_code = zip_or_postal_code
-      @country = country
-      @phone_number = phone_number
-    end
-    
-    def to_params    
-      h = {}
-      public_methods(false).each do |m|
-        next if m[-1] == '='
-        next if m == :to_params
-        h[m.to_s] = self.send(m)
-      end
-      h
-    end
-  end
-
-=end
     
   class Order < Base
     attr_accessor :shipped, :delivery_address, :events, :shipping_option_code
