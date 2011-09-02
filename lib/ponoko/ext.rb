@@ -1,4 +1,4 @@
-class Array
+module PonokoArrayExtensions
   def to_multipart key = nil
     prefix = "#{key}[]"
     collect {|a| a.to_multipart(prefix)}.flatten
@@ -14,7 +14,7 @@ class Array
   end
 end
 
-class Hash
+module PonokoHashExtensions
   def to_multipart key = nil
     collect {|k, v| v.to_multipart(key ? "#{key}[#{k}]" : k)}.flatten
   end
@@ -28,7 +28,7 @@ class Hash
   end  
 end
 
-class String
+module PonokoStringExtensions
   def to_multipart key
     "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n" + 
     "#{self}\r\n"
@@ -39,7 +39,7 @@ class String
   end
 end
 
-class File
+module PonokoFileExtensions
   def to_multipart key = nil
     "Content-Disposition: form-data; name=\"#{key}\"; filename=\"#{File.basename(self.path)}\"\r\n" +
     "Content-Transfer-Encoding: binary\r\n" +
@@ -48,3 +48,18 @@ class File
   end
 end
 
+class Array
+  include PonokoArrayExtensions
+end
+
+class Hash
+  include PonokoHashExtensions
+end
+
+class String
+  include PonokoStringExtensions
+end
+
+class File
+  include PonokoFileExtensions
+end
