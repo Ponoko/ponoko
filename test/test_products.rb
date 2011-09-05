@@ -9,7 +9,9 @@ class Test_Products < MiniTest::Unit::TestCase
   end
   
   def test_get_products
-    @test_api.expect(:get_products, make_resp(:products_200), [nil])
+      @test_api.expect(:send, 
+                       make_resp(:products_200), 
+                       ['get_products', nil])
 
     products = Ponoko::Product.get!
 
@@ -17,11 +19,12 @@ class Test_Products < MiniTest::Unit::TestCase
     assert_equal 2, products.length
     assert_equal "xxx", products.first.name
   end
+  
 
   def test_get_a_product
-    @test_api.expect(:get_products, 
+    @test_api.expect(:send, 
                       make_resp(:product_200), 
-                      ['8bf834a59b8f36091d86faa27c2dd4bb'])
+                      ['get_products', '8bf834a59b8f36091d86faa27c2dd4bb'])
 
     product = Ponoko::Product.get! "8bf834a59b8f36091d86faa27c2dd4bb"
 
@@ -78,23 +81,37 @@ class Test_Products < MiniTest::Unit::TestCase
   end
   
   def test_add_image
-    product.add_image file, true
-    product.add_image file
-    product.save!
+    skip "Unfinished"
+    product = Ponoko::Product.new
+    image_file_default = File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
+    image_file = File.new(File.dirname(__FILE__) + "/Fixtures/3d-1_product_page.jpg")
+    
+    product.add_image! image_file_default, true
+    product.add_image! image_file
 
     @test_api.verify
   end
   
   def test_add_assembly_instructions
-    product.add_assembly_instructions file
-    product.save!
+    skip "Unfinished"
+    product = Ponoko::Product.new
+    product.add_assembly_instructions! file
+
+    @test_api.verify
+  end
+  
+  def test_add_assembly_instructions_instructables
+    skip "Unfinished"
+    product = Ponoko::Product.new
+    product.add_assembly_instructions! file
 
     @test_api.verify
   end
   
   def test_add_hardware
-    product.add_hardware sku, quantity
-    product.save!
+    skip "Unfinished"
+    product = Ponoko::Product.new
+    product.add_hardware! sku, quantity
 
     @test_api.verify
   end

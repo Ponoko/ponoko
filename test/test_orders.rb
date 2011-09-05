@@ -9,7 +9,9 @@ class Test_Orders < MiniTest::Unit::TestCase
   end
   
   def test_get_orders
-    @test_api.expect(:get_orders, make_resp(:orders_200), [nil])
+    @test_api.expect(:send, 
+                     make_resp(:orders_200), 
+                     ['get_orders', nil])
 
     orders = Ponoko::Order.get!
 
@@ -20,7 +22,9 @@ class Test_Orders < MiniTest::Unit::TestCase
   end
 
   def test_get_an_order
-    @test_api.expect(:get_orders, make_resp(:order_200), ['order_key'])
+    @test_api.expect(:send, 
+                     make_resp(:order_200), 
+                     ['get_orders', 'order_key'])
 
     order = Ponoko::Order.get! "order_key"
 

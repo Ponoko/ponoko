@@ -5,6 +5,9 @@ rescue LoadError
   p "gem install simplecov for code coverage"
 end
 
+require 'rubygems'
+gem 'minitest' # ensures you're using the gem, and not the built in MT
+
 require 'minitest/unit'
 require 'minitest/autorun'
 

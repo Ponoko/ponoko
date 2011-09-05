@@ -13,7 +13,9 @@ class Test_Nodes < MiniTest::Unit::TestCase
   end
   
   def test_get_a_list_of_nodes
-    @test_api.expect(:get_nodes, make_resp(:nodes_200), [nil])
+    @test_api.expect(:send, 
+                     make_resp(:nodes_200), 
+                     ['get_nodes', nil])
 
     nodes = Ponoko::Node.get!
 
@@ -23,7 +25,9 @@ class Test_Nodes < MiniTest::Unit::TestCase
   end
   
   def test_get_a_node
-    @test_api.expect(:get_nodes, make_resp(:node_200), ["2413"])
+    @test_api.expect(:send, 
+                     make_resp(:node_200), 
+                     ['get_nodes', '2413'])
 
     node = Ponoko::Node.get! "2413"
 
@@ -32,7 +36,9 @@ class Test_Nodes < MiniTest::Unit::TestCase
   end
   
   def test_get_material_catalogue
-    @test_api.expect(:get_nodes, make_resp(:node_200), ["2413"])
+    @test_api.expect(:send, 
+                     make_resp(:node_200), 
+                     ['get_nodes', '2413'])
     @test_api.expect(:get_material_catalogue, 
                      make_resp(:mat_cat_200),
                      ["2413"])
@@ -47,7 +53,9 @@ class Test_Nodes < MiniTest::Unit::TestCase
   end
   
   def test_get_material_catalogue_bang
-    @test_api.expect(:get_nodes, make_resp(:node_200), ["2413"])
+    @test_api.expect(:send, 
+                     make_resp(:node_200), 
+                     ['get_nodes', '2413'])
     @test_api.expect(:get_material_catalogue, 
                      make_resp(:mat_cat_200),
                      ["2413"])
@@ -99,7 +107,9 @@ class Test_Nodes < MiniTest::Unit::TestCase
     node = Ponoko::Node.new old_catalogue
 
     assert_equal 1, node.material_catalogue.materials.length
-    @test_api.expect(:get_nodes, make_resp(:node_200), ["2413"])
+    @test_api.expect(:send, 
+                     make_resp(:node_200), 
+                     ['get_nodes', '2413'])
     @test_api.expect(:get_material_catalogue, 
                      make_resp(:mat_cat_200),
                      ["2413"])
@@ -131,7 +141,10 @@ class Test_Nodes < MiniTest::Unit::TestCase
 
     node = Ponoko::Node.new current_catalogue
 
-    @test_api.expect(:get_nodes, make_resp(:node_200), ["2413"])
+    @test_api.expect(:send, 
+                     make_resp(:node_200), 
+                     ['get_nodes', '2413'])
+
     # Shouldn't call this method
     @test_api.expect(:get_material_catalogue, 
                      :fail,
