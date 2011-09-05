@@ -1,4 +1,5 @@
 require 'rake/testtask'
+require 'ponoko'
 
 include Rake::DSL
 
@@ -8,3 +9,11 @@ Rake::TestTask.new do |t|
 end
 
 task :default => :test
+
+namespace "ponoko" do
+
+  desc "Get an access token"
+  task "authorise" do
+    Ponoko::OAuthAPI.authorize
+  end  
+end

@@ -34,7 +34,7 @@ module Ponoko
     end
 
     def self.ponoko_object
-      self.to_s.split('::').last.downcase
+      self.name.split('::').last.downcase
     end
 
     def self.ponoko_objects
@@ -94,7 +94,7 @@ module Ponoko
     
     private :designs=
     
-    def add_designs *designs
+    def add_designs *designs # quantity?
       designs.each do |d|
         @designs << d
       end

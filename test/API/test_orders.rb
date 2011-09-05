@@ -9,7 +9,7 @@ class Test_API_Orders < MiniTest::Unit::TestCase
   end
 
   def test_api_get_order_list
-    @test_auth.expect(:get, @api_responses[:orders_200], ['orders/'])
+    @test_auth.expect(:get, @api_responses[:orders_200], ['orders/', 'nil'])
 
     resp = @ponoko.get_orders
     
@@ -21,7 +21,7 @@ class Test_API_Orders < MiniTest::Unit::TestCase
   end
   
   def test_api_get_order_404
-    @test_auth.expect(:get, @api_responses[:ponoko_404], ['orders/bogus_key'])
+    @test_auth.expect(:get, @api_responses[:ponoko_404], ['orders/', 'bogus_key'])
 
     assert_raises Ponoko::PonokoAPIError do
       @ponoko.get_orders "bogus_key"
@@ -31,7 +31,7 @@ class Test_API_Orders < MiniTest::Unit::TestCase
   end
   
   def test_api_get_order
-    @test_auth.expect(:get, @api_responses[:order_200], ['orders/2413'])
+    @test_auth.expect(:get, @api_responses[:order_200], ['orders/', '2413'])
 
     resp = @ponoko.get_orders "2413"
 
@@ -46,7 +46,7 @@ class Test_API_Orders < MiniTest::Unit::TestCase
   def test_shipping_options
     @test_auth.expect(:get, 
                      @api_responses[:shipping_200], 
-                     ["orders/shipping_options?products[][key]=1234&products[][quantity]=1&products[][key]=abcdef&products[][quantity]=99&delivery_address[address_line_1]=27 Dixon Street&delivery_address[address_line_2]=Te Aro&delivery_address[city]=Wellington&delivery_address[state]=na&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New Zealand"])
+                     ["orders/', 'shipping_options?products[][key]=1234&products[][quantity]=1&products[][key]=abcdef&products[][quantity]=99&delivery_address[address_line_1]=27 Dixon Street&delivery_address[address_line_2]=Te Aro&delivery_address[city]=Wellington&delivery_address[state]=na&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New Zealand"])
     
     resp = @ponoko.get_shipping_options({'products' => [{'key' => '1234', 'quantity' => '1'}, {'key' => 'abcdef', 'quantity' => '99'}],
                                          'delivery_address' => {'address_line_1' => '27 Dixon Street', 'address_line_2' => 'Te Aro', 'city' => 'Wellington', 'state' => 'na', 'zip_or_postal_code' => '6021', 'country' => 'New Zealand'}})
@@ -62,7 +62,7 @@ class Test_API_Orders < MiniTest::Unit::TestCase
   def test_shipping_options_fail
     @test_auth.expect(:get, 
                      @api_responses[:ponoko_404],
-                     ["orders/shipping_options?delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[state]=na&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"])
+                     ["orders/', 'shipping_options?delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[state]=na&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"])
 
     assert_raises Ponoko::PonokoAPIError do
       @ponoko.get_shipping_options({})
@@ -95,7 +95,7 @@ class Test_API_Orders < MiniTest::Unit::TestCase
   end
   
   def test_bump_order_state
-    @test_auth.expect(:get, @api_responses[:order_200], ['orders/trigger-next-event/order_key'])
+    @test_auth.expect(:get, @api_responses[:order_200], ['orders/trigger-next-event/', 'order_key'])
 
     resp = @ponoko.step_order 'order_key'
 
@@ -118,7 +118,7 @@ class Test_API_Orders < MiniTest::Unit::TestCase
   end
   
   def test_order_status
-    @test_auth.expect(:get, @api_responses[:status], ['orders/status/order_key'])
+    @test_auth.expect(:get, @api_responses[:status], ['orders/status/', 'order_key'])
 
     resp = @ponoko.get_order_status 'order_key'
     

@@ -5,10 +5,17 @@ require 'ponoko'
 
 
 Ponoko.api = Ponoko::OAuthAPI.new env:             :sandbox,
-                                  consumer_key:    '', 
-                                  consumer_secret: '',
-                                  access_token:    '', 
-                                  access_secret:   ''
+                                  consumer_key:    'd2KxglROLzixJ53NAwTRVoAVMsmJZ5X7BxjfS7fc', 
+                                  consumer_secret: 'vUk5HwgoGBe95P6zfyNrkW4Mkjojvkw84sd6BXik',
+                                  access_token:    'Obq8aJ4O7Y8XCfkB1eFUjRMtRILPIfXiA80WvGnd', 
+                                  access_secret:   'hNUeBfLcoz5K72TPRO3nW3Ovw7fcjzqyp84NzT7X'
+
+
+# Ponoko.api = Ponoko::OAuthAPI.new env:             :test,
+#                                   consumer_key:    'mgaFFoAzbnc7I4pOitGWf9ATECzDElfZB072ugmR', 
+#                                   consumer_secret: 'yivct1T8KciWG2astV5ljPsYTjkEGwNIckOUOikS',
+#                                   access_token:    'OZwmvuSbijjMRRvlFH3vYD7tnZCyLiXVaSmtblHr', 
+#                                   access_secret:   'bOAI6FJx1m8QbhPbAxy19orvCf9y1Kbk5rNinhyg'
 
 
 p "##############################"
@@ -31,55 +38,51 @@ p "##############################"
 
 pp products = Ponoko::Product.get!
 
-pp Ponoko::Product.get! products.first.ref unless products.empty?
+pp Ponoko::Product.get! products.first.key unless products.empty?
 
-product = Ponoko::Product.new 'ref' => 'product_ref', 'name' => 'Product', 'description' => 'This is a product description'
-
-file = File.new(File.dirname(__FILE__) + "/Fixtures/exclamation_lamp/3mm_acrylic-191x191mm.svg")
-design = Ponoko::Design.new 'ref' => '42', 'design_file' => file
-
-material = mc['Plastic']['Acrylic']['Red']['3.0 mm']['P2']
-pp material
-design.add_material material
-
-product.add_designs design
-
-product.send!
-pp product
+# product = Ponoko::Product.new 'ref' => 'product_ref-' + Time.new.to_s, 'name' => 'Product', 'description' => 'This is a product description'
+# 
+# file = File.new(File.dirname(__FILE__) + "/Fixtures/exclamation_lamp/3mm_acrylic-191x191mm.svg")
+# design = Ponoko::Design.new 'ref' => '42', 'design_file' => file
+# 
+# material = mc['Plastic']['Acrylic']['Red']['3.0 mm']['P2']
+# pp material
+# design.add_material material
+# 
+# product.add_designs design
+# 
+# product.send!
+# pp product
 
 
 p "##############################"
 p "Orders"
 p "##############################"
 
-
 orders = Ponoko::Order.get!
 pp orders
 
-order = Ponoko::Order.get! orders.first.ref
-pp order
+pp Ponoko::Order.get! orders.first.ref unless orders.empty?
 
-pp order.status!
-
-Ponoko::Sandbox::step_order order
-
-pp order.status!
-
-
-=begin
-address = Ponoko::Address.new 'John', 'Brown', '27 Dixon Street', 'Te Aro', 'Wellington', 'na', '6021', 'New Zealand', '+6421782215'
+address = {"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}
 
 order = Ponoko::Order.new 'ref' => 'order_ref97', 'delivery_address' => address, 'shipping_option_code' => 'ups_saver'
 
 order.add_product products.first
 
+shipping_options = order.shipping_options!
+
+pp shipping_options
+
 pp order
 
-=end
-
-=begin
 order.send!
 
 pp order
-=end
+
+pp order.status
+
+Ponoko::Sandbox::step_order order
+
+pp order.status
 

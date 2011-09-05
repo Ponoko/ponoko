@@ -89,8 +89,7 @@ module Ponoko
         '--' + boundary + "\r\n" + p
       end.join('') + "--" + boundary + "--\r\n"
 
-#       resp = @client.post("products/", "query", {"Content-Type" => "multipart/form-data; boundary=#{boundary}"})
-      resp = @client.post("products/", query, nil)
+      resp = @client.post("products/", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
 
       handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
