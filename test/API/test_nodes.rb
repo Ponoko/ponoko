@@ -48,7 +48,7 @@ class Test_API_Nodes < MiniTest::Unit::TestCase
   end
   
   def test_api_get_material_cataloge
-    @test_auth.expect(:get, @api_responses[:mat_cat_200], ["nodes/material-catalog/', '2413"])
+    @test_auth.expect(:get, @api_responses[:mat_cat_200], ["nodes/material-catalog/", "2413"])
 
     materials = @ponoko.get_material_catalogue '2413'
 
