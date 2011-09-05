@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
-class Test_Client < MiniTest::Unit::TestCase
+class Test_API_Nodes < MiniTest::Unit::TestCase
   def setup
     load_test_resp
     
@@ -10,7 +10,7 @@ class Test_Client < MiniTest::Unit::TestCase
   end
 
   def test_api_get_node_list
-    @test_auth.expect(:get, @api_responses[:nodes_200], ['nodes/'])
+    @test_auth.expect(:get, @api_responses[:nodes_200], ['nodes/', nil])
 
     resp = @ponoko.get_nodes
     
@@ -22,10 +22,9 @@ class Test_Client < MiniTest::Unit::TestCase
   def test_api_get_node_404
     @test_auth.expect(:get, @api_responses[:ponoko_404], ['nodes/', 'bogus_key'])
 
-    assert_raises Ponoko::PonokoAPIError do
-      @ponoko.get_nodes "bogus_key"
-    end    
+    resp = @ponoko.get_nodes "bogus_key"
 
+    assert_equal 'error', resp.keys.first
     @test_auth.verify
   end
   
@@ -40,12 +39,11 @@ class Test_Client < MiniTest::Unit::TestCase
   end
   
   def test_api_get_material_cataloge_fail
-    @test_auth.expect(:get, @api_responses[:ponoko_404], ["nodes/material-catalog/', 'bogus_key"])
+    @test_auth.expect(:get, @api_responses[:ponoko_404], ["nodes/material-catalog/", "bogus_key"])
 
-    assert_raises Ponoko::PonokoAPIError do
-      @ponoko.get_material_catalogue 'bogus_key'
-    end
+    resp = @ponoko.get_material_catalogue 'bogus_key'
     
+    assert_equal 'error', resp.keys.first
     @test_auth.verify
   end
   

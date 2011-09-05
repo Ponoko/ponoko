@@ -1,5 +1,5 @@
 require 'rake/testtask'
-require 'ponoko'
+# require 'ponoko'
 
 include Rake::DSL
 
