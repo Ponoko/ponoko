@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "oauth"
   s.add_development_dependency "simplecov"
+  s.add_development_dependency "minitest", ">= 2.5.1"
 
   s.files = FileList['lib/**/*.rb', '[A-Z]*', 'test/**/*'].to_a  
 
