@@ -48,6 +48,13 @@ module PonokoFileExtensions
   end
 end
 
+module PonokoTrueClassExtensions
+  def to_multipart key = nil
+    "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n" + 
+    "1\r\n"
+  end
+end
+
 class Array
   include PonokoArrayExtensions
 end
@@ -62,4 +69,8 @@ end
 
 class File
   include PonokoFileExtensions
+end
+
+class TrueClass
+  include PonokoTrueClassExtensions
 end
