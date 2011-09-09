@@ -91,6 +91,8 @@ class MiniTest::Unit::TestCase
       :status       => FakeHTTPResponse.new('200', "{\"order\": {\"key\": \"order_key\", \"ref\": \"4321\", \"shipped\": false, \"events\": [{\"name\": \"design_checked\", \"completed_at\": \"2011/01/01 12:00:00 +0000\"}], \"last_successful_callback_at\": \"2011/01/01 12:00:00 +0000\", \"shipping_option_code\": \"ups_ground\", \"tracking_numbers\": [\"xxx-yyy\"]}}"),
 
       :shipping_200 => FakeHTTPResponse.new('200', "{\"shipping_options\": {\"products\": [{\"key\": \"1234\", \"ref\": \"4321\", \"quantity\": 1},{\"key\": \"1235\", \"ref\": \"abcdef\", \"quantity\": 99}], \"quantity\": 1, \"currency\": \"USD\", \"options\": [{\"code\": \"ups_ground\", \"name\": \"UPS Ground\", \"price\": \"56.78\"}]}}"),
+      :image_200 => FakeHTTPResponse.new('200', "The contents of an image file"),
+      :assembly_200 => FakeHTTPResponse.new('200', "The contents of a file")
     }
   end
   

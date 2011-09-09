@@ -42,6 +42,7 @@ module Ponoko
     end
 
     def self.get! key = nil
+#       resp = with_handle_error { Ponoko::api.send "get_#{ponoko_objects}", key }
       resp = Ponoko::api.send "get_#{ponoko_objects}", key
       if key.nil?
         resp[ponoko_objects].collect do |p|
@@ -57,11 +58,25 @@ module Ponoko
       update resp[self.class.ponoko_object]
     end
     
+      def with_handle_error
+        resp = JSON.parse yield
+      rescue
+        raise    
+      else
+        if resp['error']
+          fail PonokoAPIError, resp['message']
+        end
+        resp
+      end
+    
+#     protected :with_handle_error
+        
   end
   
   class Product < Base
-    attr_accessor :name, :description, :materials_available, :locked, :total_make_cost, :node_key
-    attr_reader   :designs
+    attr_accessor :name, :description, :materials_available, :locked, :total_make_cost, 
+                  :node_key, :hardware
+    attr_reader   :designs, :design_images, :hardware, :assembly_instructions
     
     private :total_make_cost, :locked
     
@@ -74,6 +89,9 @@ module Ponoko
 
     def initialize params = {}
       @designs = []
+      @design_images = []
+      @hardware = []
+      @assembly_instructions = []
       super params
     end
     
@@ -94,12 +112,48 @@ module Ponoko
     
     private :designs=
     
+    def hardware= hardware
+      @hardware.clear
+      hardware.each do |d|
+        add_designs Hardware.new(d)
+      end
+    end
+    
+    private :hardware=
+    
     def add_designs *designs # quantity?
       designs.each do |d|
         @designs << d
       end
     end
     
+    def add_design!
+    end
+    
+    def add_design_image file, default = false
+    end
+    
+    def add_design_image! file, default = false
+    end
+    
+    def get_design_image_file! filename
+    end
+    
+    def add_assembly_instructions file_or_url
+    end
+    
+    def add_assembly_instructions! file_or_url
+    end
+    
+    def get_assembly_instructions_file! filename
+    end
+    
+    def add_hardware sku, quantity
+    end
+
+    def add_hardware! sku, quantity
+    end
+
     def to_params
       raise Ponoko::PonokoAPIError, "Product must have a Design." if designs.empty?
       {'ref' => ref, 'name' => name, 'description' => description, 'designs' => @designs.to_params}
@@ -156,6 +210,13 @@ module Ponoko
     def to_params
       key
     end
+  end
+  
+  class Third_Party_Item
+  end
+  
+  class Hardware < Third_Party_Item
+    attr_accessor :sku, :name, :weight, :price, :url
   end
   
   class Address < Hash; end

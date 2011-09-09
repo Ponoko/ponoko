@@ -48,6 +48,12 @@ module PonokoFileExtensions
   end
 end
 
+module PonokoFixnumExtensions
+  def to_query key
+    {key => "#{self}"}
+  end
+end
+
 module PonokoTrueClassExtensions
   def to_multipart key = nil
     "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n" + 
@@ -69,6 +75,10 @@ end
 
 class File
   include PonokoFileExtensions
+end
+
+class Fixnum
+  include PonokoFixnumExtensions
 end
 
 class TrueClass

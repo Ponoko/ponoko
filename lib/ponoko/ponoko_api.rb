@@ -95,41 +95,62 @@ module Ponoko
       JSON.parse(resp.body)      
     end
     
-#     def add_image params
-#       boundary = "arandomstringofletters"
-#       q = params.to_multipart.collect do |p|
-#         '--' + boundary + "\r\n" + p
-#       end.join('') + "--" + boundary + "--\r\n"
-# 
-#       resp = @client.post "products/add_image", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
-# 
-#       handle_error resp unless resp.code =='200'
-#       JSON.parse(resp.body)      
-#     end
-#     
-#     def add_assembly_instructions params
-#       boundary = "arandomstringofletters"
-#       q = params.to_multipart.collect do |p|
-#         '--' + boundary + "\r\n" + p
-#       end.join('') + "--" + boundary + "--\r\n"
-# 
-#       resp = @client.post "products/add_assembly", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
-# 
-#       handle_error resp unless resp.code =='200'
-#       JSON.parse(resp.body)      
-#     end
-#     
-#     def add_hardware params
-#       q = params.to_query.collect do |p|
-#         p.collect {|k,v| "#{k}=#{v}"}
-#       end.flatten.join '&'
-# 
-#       resp = @client.post "products/add_hardware", q
-# 
-#       handle_error resp unless resp.code =='200'
-#       JSON.parse(resp.body)      
-#     end
-#     
+    def add_design_image product_key, image_params
+      # products/3c479d62f2dae6e703861e50d4271efc/design_images
+      # design_images[][uploaded_data]
+      # design_images[][default]
+      boundary = "arandomstringofletters"
+      q = image_params.to_multipart.collect do |p|
+        '--' + boundary + "\r\n" + p
+      end.join('') + "--" + boundary + "--\r\n"
+
+      resp = @client.post "products/#{product_key}/design_images/", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def get_design_image key, filename
+      # products/3c479d62f2dae6e703861e50d4271efc/design_images/download?filename=lamp-1_product_page.jpg
+      resp = @client.get "products/#{key}/design_images/download", "filename=#{filename}"
+      handle_error resp unless resp.code =='200'
+      resp.body
+    end
+    
+    def add_assembly_instructions product_key, params
+      # products/3c479d62f2dae6e703861e50d4271efc/assembly_instructions
+      # assembly_instructions[][uploaded_data]
+      boundary = "arandomstringofletters"
+      q = params.to_multipart.collect do |p|
+        '--' + boundary + "\r\n" + p
+      end.join('') + "--" + boundary + "--\r\n"
+
+      resp = @client.post "products/#{product_key}/assembly_instructions/", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def get_assembly_instructions key, filename
+      # products/3c479d62f2dae6e703861e50d4271efc/assembly_instructions/download?filename=lamp-1_product_page.jpg
+      resp = @client.get "products/#{key}/assembly_instructions/download", "filename=#{filename}"
+      handle_error resp unless resp.code =='200'
+      resp.body
+    end
+    
+    def add_hardware product_key, hardware_params
+      # products/3c479d62f2dae6e703861e50d4271efc/hardware
+      # hardware[sku]
+      q = hardware_params.to_query.collect do |p|
+        p.collect {|k,v| "#{k}=#{v}"}
+      end.flatten.join '&'
+
+      resp = @client.post "products/#{product_key}/hardware", q
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
     def handle_error resp
       error = JSON.parse resp.body
       warn error
