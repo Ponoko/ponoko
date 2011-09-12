@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/test_helper")
 
-class Test_MaterialCatalogue < MiniTest::Unit::TestCase
+class TestMaterialCatalogue < MiniTest::Unit::TestCase
   def test_construct_material_catalogue
     m = Ponoko::MaterialCatalogue.new
     raw_data = [{"updated_at" => "2011/03/17 02:08:51 +0000","type" => "P1","weight" => "0.1 kg","color" => "Fuchsia","key" => "6812d5403269012e2f2f404062cdb04a","thickness" => "3.0 mm","name" => "Felt","width" => "181.0 mm","material_type" => "sheet","length" => "181.0 mm","kind" => "Fabric"},

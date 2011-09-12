@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
-class Test_API_Nodes < MiniTest::Unit::TestCase
+class TestAPINodes < MiniTest::Unit::TestCase
   def setup
     load_test_resp
     
@@ -10,7 +10,7 @@ class Test_API_Nodes < MiniTest::Unit::TestCase
   end
 
   def test_api_get_node_list
-    @test_auth.expect(:get, @api_responses[:nodes_200], ['nodes/', nil])
+    @test_auth.expect(:get, @api_responses[:nodes_200], ['nodes/', ""])
 
     resp = @ponoko.get_nodes
     

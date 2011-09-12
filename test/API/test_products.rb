@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
-class Test_API_Products < MiniTest::Unit::TestCase
+class TestAPIProducts < MiniTest::Unit::TestCase
   def setup
     load_test_resp
 
@@ -10,7 +10,7 @@ class Test_API_Products < MiniTest::Unit::TestCase
   end
 
   def test_api_get_product_list
-    @test_auth.expect(:get, @api_responses[:products_200], ['products/', nil])
+    @test_auth.expect(:get, @api_responses[:products_200], ['products/', ""])
 
     resp = @ponoko.get_products
     
@@ -81,8 +81,8 @@ class Test_API_Products < MiniTest::Unit::TestCase
     image_file_default = File.new(File.dirname(__FILE__) + "/../fixtures/lamp-1_product_page.jpg")
     image_file = File.new(File.dirname(__FILE__) + "/../fixtures/3d-1_product_page.jpg")
 
-    resp = @ponoko.add_design_image "2413", {:uploaded_data => image_file_default, :default => true}
-    resp = @ponoko.add_design_image "2413", {:uploaded_data => image_file}
+    resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file_default, :default => true}
+    resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file}
   end
   
   def test_get_an_image
@@ -95,20 +95,20 @@ class Test_API_Products < MiniTest::Unit::TestCase
   end
   
   def test_add_assembly_instructions
-    @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_assembly_instructions', "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"uploaded_data\"; filename=\"instructions.txt\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.txt\r\n\r\nA test assembly instruction file.\n\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
 
     file = File.new(File.dirname(__FILE__) + "/../fixtures/instructions.txt")
-    resp = @ponoko.add_assembly_instructions "2413", :uploaded_data => file
+    resp = @ponoko.post_assembly_instructions_file "2413", :uploaded_data => file
 
     assert resp
     @test_auth.verify
   end
   
   def test_add_assembly_instructions_instructables
-    @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_assembly_instructions', "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
-
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
-    resp = @ponoko.add_assembly_instructions '2413', :file_url => url
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", "file_url=#{url}"]
+
+    resp = @ponoko.post_assembly_instructions_url '2413', :file_url => url
 
     assert resp
     @test_auth.verify
@@ -128,15 +128,15 @@ class Test_API_Products < MiniTest::Unit::TestCase
     sku = 'COM-00680' # LED Light Bar - White
     quantity = 3
 
-    resp = @ponoko.add_hardware "2413", {:sku => sku, :quantity => quantity}
+    resp = @ponoko.post_hardware "2413", {'sku' => sku, 'quantity' => quantity}
 
     @test_auth.verify
   end
   
   def test_escape_params
-    @test_auth.expect(:get, @api_responses[:product_200], ['products/', 'funky[] key'])
+    @test_auth.expect(:get, @api_responses[:product_200], ['products/', 'fun%25ky[]%20key'])
 
-    resp = @ponoko.get_products({:key => "funky[] key"})
+    resp = @ponoko.get_products "fun%ky[] key"
 
     product = resp['product']
 

@@ -91,8 +91,41 @@ class MiniTest::Unit::TestCase
       :status       => FakeHTTPResponse.new('200', "{\"order\": {\"key\": \"order_key\", \"ref\": \"4321\", \"shipped\": false, \"events\": [{\"name\": \"design_checked\", \"completed_at\": \"2011/01/01 12:00:00 +0000\"}], \"last_successful_callback_at\": \"2011/01/01 12:00:00 +0000\", \"shipping_option_code\": \"ups_ground\", \"tracking_numbers\": [\"xxx-yyy\"]}}"),
 
       :shipping_200 => FakeHTTPResponse.new('200', "{\"shipping_options\": {\"products\": [{\"key\": \"1234\", \"ref\": \"4321\", \"quantity\": 1},{\"key\": \"1235\", \"ref\": \"abcdef\", \"quantity\": 99}], \"quantity\": 1, \"currency\": \"USD\", \"options\": [{\"code\": \"ups_ground\", \"name\": \"UPS Ground\", \"price\": \"56.78\"}]}}"),
-      :image_200 => FakeHTTPResponse.new('200', "The contents of an image file"),
-      :assembly_200 => FakeHTTPResponse.new('200', "The contents of a file")
+      :image_200    => FakeHTTPResponse.new('200', "The contents of an image file"),
+      :assembly_200 => FakeHTTPResponse.new('200', "The contents of a file"),
+      :hardware_200 => FakeHTTPResponse.new('200', "{\"product\":{\"name\":\"xxx\",
+                                                                  \"created_at\":\"2011/07/19 09:14:45 +0000\",
+                                                                  \"updated_at\":\"2011/07/19 09:14:47 +0000\",
+                                                                  \"locked?\":false,
+                                                                  \"total_make_cost\":{\"total\":\"18.86\",
+                                                                                       \"making\":\"16.02\",
+                                                                                       \"materials\":\"2.84\",
+                                                                                       \"currency\":\"USD\"},
+                                                                  \"node_key\":\"2e9d8c90326e012e359f404062cdb04a\",
+                                                                  \"ref\":\"product_ref\",
+                                                                  \"description\":null,
+                                                                  \"key\":\"8bf834a59b8f36091d86faa27c2dd4bb\",
+                                                                  \"hardware\":[{\"sku\":\"COM-00680\",
+                                                                                 \"name\":\"LED Light Bar - White\",
+                                                                                 \"weight\":\"9.9kg\",
+                                                                                 \"price\":\"9.99\",
+                                                                                 \"quantity\":3
+                                                                                 }],
+                                                                  \"materials_available?\":true,
+                                                                  \"designs\":[{\"size\":137984,
+                                                                                \"created_at\":\"2011/07/19 09:14:45 +0000\",
+                                                                                \"quantity\":1,
+                                                                                \"content_type\":\"application/stl\",
+                                                                                \"updated_at\":\"2011/07/19 09:14:49 +0000\",
+                                                                                \"material_key\":\"6bb50fd03269012e3526404062cdb04a\",
+                                                                                \"filename\":\"bottom_new.stl\",
+                                                                                \"ref\":\"42\",
+                                                                                \"key\":\"b417306bffdfe15b4500a6372305ba10\",
+                                                                                \"make_cost\":{\"total\":\"18.86\",
+                                                                                               \"making\":\"16.02\",
+                                                                                               \"materials\":\"2.84\",
+                                                                                               \"currency\":\"USD\"}}]}}")
+
     }
   end
   

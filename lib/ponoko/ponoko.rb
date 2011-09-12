@@ -112,10 +112,10 @@ module Ponoko
     
     private :designs=
     
-    def hardware= hardware
+    def hardware= hw
       @hardware.clear
-      hardware.each do |d|
-        add_designs Hardware.new(d)
+      hw.each do |h|
+        add_hardware Hardware.new(h), 1
       end
     end
     
@@ -128,30 +128,57 @@ module Ponoko
     end
     
     def add_design!
+      resp = Ponoko::api.post_design self.key, design
+      update resp['product']
     end
     
     def add_design_image file, default = false
+      resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
+      update resp['product']
     end
     
     def add_design_image! file, default = false
+      resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
+      update resp['product']
     end
     
     def get_design_image_file! filename
+      Ponoko::api.get_design_image self.key, {'filename' => filename}
     end
     
     def add_assembly_instructions file_or_url
+      resp = if file_or_url.is_a? File
+        Ponoko::api.post_assembly_instructions self.key, {'uploaded_data' => file_or_url}
+      else
+        Ponoko::api.post_assembly_instructions self.key, {'file_url' => file_or_url}
+      end
+          
+      update resp['product']
     end
     
     def add_assembly_instructions! file_or_url
+      resp = Ponoko::api.post_assembly_instructions self.key, {'uploaded_data' => file_or_url}
+      update resp['product']
     end
     
     def get_assembly_instructions_file! filename
+      Ponoko::api.get_assembly_instructions self.key, {'filename' => filename}
     end
     
-    def add_hardware sku, quantity
+    def add_hardware hardware_or_sku, quantity
+      if hardware_or_sku.is_a? String
+        resp = Ponoko::api.post_hardware self.key, {'sku' => sku, 'quantity' => quantity}
+        update resp['product']
+      else
+        hardware << hardware_or_sku
+      end
+      
+      self
     end
 
     def add_hardware! sku, quantity
+      resp = Ponoko::api.post_hardware self.key, {'sku' => sku, 'quantity' => quantity}
+      update resp['product']
     end
 
     def to_params
@@ -212,11 +239,11 @@ module Ponoko
     end
   end
   
-  class Third_Party_Item
+  class Third_Party_Item < Base
   end
   
   class Hardware < Third_Party_Item
-    attr_accessor :sku, :name, :weight, :price, :url
+    attr_accessor :sku, :name, :weight, :price, :url, :quantity
   end
   
   class Address < Hash; end

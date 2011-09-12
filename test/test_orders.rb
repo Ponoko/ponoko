@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/test_helper")
 
-class Test_Orders < MiniTest::Unit::TestCase
+class TestOrders < MiniTest::Unit::TestCase
   def setup
     load_test_resp
 

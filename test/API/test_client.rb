@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
-class Test_Client < MiniTest::Unit::TestCase
+class TestClient < MiniTest::Unit::TestCase
   def test_oauth
     skip "Un-skip this test if you have edited the OAuth code"
     ponoko = Ponoko::OAuthAPI.new env:             :production,

@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/test_helper")
 
-class Test_Products < MiniTest::Unit::TestCase
+class TestProducts < MiniTest::Unit::TestCase
   def setup
     load_test_resp
 
@@ -81,57 +81,91 @@ class Test_Products < MiniTest::Unit::TestCase
   end
   
   def test_add_image
-    product = Ponoko::Product.new
-    image_file_default = File.new(File.dirname(__FILE__) + "/fixtures/lamp-1_product_page.jpg")
+    product = Ponoko::Product.new 'key' => "product_key"
     image_file = File.new(File.dirname(__FILE__) + "/fixtures/3d-1_product_page.jpg")
+    @test_api.expect :post_design_image, 
+                      make_resp(:post_product_200), 
+                      [String, {"uploaded_data" => image_file, 'default' => false}]
+                      
     
-    product.add_design_image! image_file_default, true
     product.add_design_image! image_file
 
     @test_api.verify
   end
   
+  def test_add_default_image
+    product = Ponoko::Product.new 'key' => "product_key"
+    image_file_default = File.new(File.dirname(__FILE__) + "/fixtures/lamp-1_product_page.jpg")
+    @test_api.expect :post_design_image, 
+                      make_resp(:post_product_200), 
+                      [String, {"uploaded_data" => image_file_default, 'default' => true}]
+    
+    product.add_design_image! image_file_default, true
+
+    @test_api.verify
+  end
+  
   def test_get_design_image
-    product = Ponoko::Product.new
+    @test_api.expect :get_design_image, 
+                      @api_responses[:image_200],
+                      [String, {"filename" => "3d-1_product_page.jpg"}]
+
+    product = Ponoko::Product.new 'key' => "product_key"
     product.get_design_image_file! '3d-1_product_page.jpg'
     @test_api.verify
   end
   
   def test_add_assembly_instructions
-    product = Ponoko::Product.new
-    file = 'instructions.txt'
+    product = Ponoko::Product.new 'key' => "product_key"
+    file = File.new(File.dirname(__FILE__) + "/fixtures/instructions.txt")
+    @test_api.expect :post_assembly_instructions, 
+                      make_resp(:post_product_200), 
+                      [String, {"uploaded_data" => file}]
+    
     product.add_assembly_instructions file
 
     @test_api.verify
   end
   
   def test_add_assembly_instructions_instructables
-    product = Ponoko::Product.new
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
+    @test_api.expect :post_assembly_instructions, 
+                    make_resp(:post_product_200), 
+                    [String, {"file_url" => url}]
+
+    product = Ponoko::Product.new 'key' => "product_key"
     product.add_assembly_instructions url
 
     @test_api.verify
   end
   
   def test_get_assembly_instructions
-    product = Ponoko::Product.new
+    @test_api.expect :get_assembly_instructions, 
+                      @api_responses[:assembly_200], 
+                      [String, {"filename" => "instructions.txt"}]
+
+    product = Ponoko::Product.new 'key' => "product_key"
     product.get_assembly_instructions_file! "instructions.txt"
     @test_api.verify
   end
   
   def test_add_hardware
-    @test_api.expect :post_product, 
-                    make_resp(:post_product_200), 
-                    [{"sku" => "COM-00680", "quantity"=>"3"}]
+    @test_api.expect :post_hardware, 
+                     make_resp(:hardware_200), 
+                     [String, {"sku" => "COM-00680", "quantity" => 3}]
 
-    product = Ponoko::Product.new
+    product = Ponoko::Product.new 'key' => "product_key"
     sku = 'COM-00680' # LED Light Bar - White
     quantity = 3
+    
+    assert product.hardware.empty?
     
     product.add_hardware! sku, quantity
 
     @test_api.verify
-    assert_equal 'LED Light Bar - White', product.hardware.name
+    assert_equal 1, product.hardware.length
+    assert_equal 'LED Light Bar - White', product.hardware.first.name
+    assert_equal 3, product.hardware.first.quantity
   end
   
 end
