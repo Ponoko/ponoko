@@ -20,7 +20,7 @@ module PonokoHashExtensions
   end
   
   def to_query key = nil
-    collect {|k, v| v.to_query(key ? "#{key}[#{k}]" : k)}.flatten
+    collect {|k, v| v.to_query(key ? "#{key}[#{k}]" : k)}.flatten.join '&'
   end
   
   def to_params
@@ -34,8 +34,9 @@ module PonokoStringExtensions
     "#{self}\r\n"
   end
   
-  def to_query key
-    {key => self}
+  def to_query key = nil
+    key ? URI.escape("#{key}=#{self}")
+        : URI.escape(self)
   end
 end
 
@@ -49,15 +50,29 @@ module PonokoFileExtensions
 end
 
 module PonokoFixnumExtensions
-  def to_query key
-    {key => "#{self}"}
+  def to_query key = nil
+    key ? URI.escape("#{key}=#{self}")
+        : URI.escape(self)
+  end
+end
+
+module PonokoFloatExtensions
+  def to_query key = nil
+    key ? URI.escape("#{key}=#{self}")
+        : URI.escape(self)
   end
 end
 
 module PonokoTrueClassExtensions
-  def to_multipart key = nil
+  def to_multipart key
     "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n" + 
     "1\r\n"
+  end
+end
+
+module PonokoNilClassExtensions
+  def to_query key = nil
+    ""
   end
 end
 
@@ -81,6 +96,14 @@ class Fixnum
   include PonokoFixnumExtensions
 end
 
+class Float
+  include PonokoFloatExtensions
+end
+
 class TrueClass
   include PonokoTrueClassExtensions
+end
+
+class NilClass
+  include PonokoNilClassExtensions
 end
