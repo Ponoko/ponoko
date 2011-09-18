@@ -1,5 +1,5 @@
 module PonokoArrayExtensions
-  def to_multipart key = nil
+  def to_multipart key
     prefix = "#{key}[]"
     collect {|a| a.to_multipart(prefix)}.flatten
   end
