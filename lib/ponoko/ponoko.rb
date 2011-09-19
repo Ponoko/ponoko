@@ -351,7 +351,7 @@ module Ponoko
       materials_date = materials_updated_at
       update! # update self from server
 
-      if @material_catalogue.nil? || materials_updated_at > materials_date
+      if @material_catalogue.nil? or materials_updated_at > materials_date
         resp = Ponoko::api.get_material_catalogue key
         raise Ponoko::PonokoAPIError, "Unknown Error Occurred" unless key ==  resp['key']
         update resp

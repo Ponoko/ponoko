@@ -75,7 +75,19 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     
   end
   
-  def test_add_image
+  def test_add_design
+    assert false
+  end
+  
+  def test_update_design
+    assert false
+  end
+  
+  def test_destroy_design
+    assert false
+  end
+  
+  def test_add_design_image
     @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_design_images', "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
 
     image_file_default = File.new(File.dirname(__FILE__) + "/../fixtures/lamp-1_product_page.jpg")
@@ -85,13 +97,17 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file}
   end
   
-  def test_get_an_image
+  def test_get_design_image
     @test_auth.expect(:get, @api_responses[:image_200], ['products/2413/design_images/download','filename=lamp-1_product_page.jpg'])
 
     resp = @ponoko.get_design_image "2413", "lamp-1_product_page.jpg"
 
     @test_auth.verify
     assert_equal "The contents of an image file", resp
+  end
+  
+  def test_destroy_design_image
+    assert false
   end
   
   def test_add_assembly_instructions
@@ -114,13 +130,25 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     @test_auth.verify
   end
   
-  def test_get_assembly_instructions
-    @test_auth.expect(:get, @api_responses[:assembly_200], ['products/2413/assembly_instructions/download','filename=instructions.txt'])
+  def test_get_assembly_instructions_file
+    @test_auth.expect :get, @api_responses[:assembly_200], ['products/2413/assembly_instructions/download','filename=instructions.txt']
 
     resp = @ponoko.get_assembly_instructions "2413", "instructions.txt"
 
     @test_auth.verify
     assert_equal "The contents of a file", resp
+  end
+  
+  def test_get_assembly_instructions_url
+    assert false
+  end
+  
+  def test_destroy_assembly_instructions_file
+    assert false
+  end
+  
+  def test_destroy_assembly_instructions_url
+    assert false
   end
   
   def test_add_hardware
@@ -131,6 +159,14 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     resp = @ponoko.post_hardware "2413", {'sku' => sku, 'quantity' => quantity}
 
     @test_auth.verify
+  end
+
+  def test_update_hardware
+    assert false
+  end
+  
+  def test_destroy_hardware
+    assert false
   end
   
   def test_escape_params

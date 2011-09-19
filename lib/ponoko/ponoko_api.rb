@@ -75,7 +75,6 @@ module Ponoko
     end
     
     def post_product params
-#       boundary = Digest::MD5.hexdigest(Time.now.to_s)
       boundary = "arandomstringofletters"
       query = params.to_multipart.collect do |p|
         '--' + boundary + "\r\n" + p
@@ -85,6 +84,36 @@ module Ponoko
 
       handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
+    end
+    
+    def post_design product_key, params
+      boundary = "arandomstringofletters"
+      query = params.to_multipart.collect do |p|
+        '--' + boundary + "\r\n" + p
+      end.join('') + "--" + boundary + "--\r\n"
+
+      resp = @client.post("products/#{product_key}/designs", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def update_design product_key, params
+      boundary = "arandomstringofletters"
+      query = params.to_multipart.collect do |p|
+        '--' + boundary + "\r\n" + p
+      end.join('') + "--" + boundary + "--\r\n"
+
+      resp = @client.post("products/#{product_key}/designs/update", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
+
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def destroy_design product_key, design_key
+      resp = @client.post "products/#{product_key.to_query}/designs/#{design_key.to_query}/destroy"
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)
     end
     
     def post_design_image product_key, image_params
@@ -102,9 +131,14 @@ module Ponoko
       JSON.parse(resp.body)      
     end
     
-    def get_design_image key, filename
-      # products/3c479d62f2dae6e703861e50d4271efc/design_images/download?filename=lamp-1_product_page.jpg
-      resp = @client.get "products/#{key.to_query}/design_images/download", filename.to_query("filename")
+    def get_design_image product_key, filename
+      resp = @client.get "products/#{product_key.to_query}/design_images/download", filename.to_query("filename")
+      handle_error resp unless resp.code =='200'
+      resp.body
+    end
+    
+    def destroy_design_image product_key, filename
+      resp = @client.post "products/#{product_key.to_query}/design_images/download", filename.to_query("filename")
       handle_error resp unless resp.code =='200'
       resp.body
     end
@@ -123,23 +157,36 @@ module Ponoko
     
     def post_assembly_instructions_url product_key, params
       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params.to_query
-
       handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
     def get_assembly_instructions key, filename
-      # products/3c479d62f2dae6e703861e50d4271efc/assembly_instructions/download?filename=lamp-1_product_page.jpg
       resp = @client.get "products/#{key.to_query}/assembly_instructions/download", filename.to_query("filename")
       handle_error resp unless resp.code =='200'
       resp.body
     end
     
+    def destroy_assembly_instructions_url product_key, params
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params.to_query
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
     def post_hardware product_key, hardware_params
-      # products/3c479d62f2dae6e703861e50d4271efc/hardware
-      # hardware[sku]
       resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
-
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def update_hardware product_key, hardware_params
+      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
+      handle_error resp unless resp.code =='200'
+      JSON.parse(resp.body)      
+    end
+    
+    def destroy_hardware product_key, hardware_params
+      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
       handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
