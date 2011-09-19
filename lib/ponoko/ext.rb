@@ -4,7 +4,7 @@ module PonokoArrayExtensions
     collect {|a| a.to_multipart(prefix)}.flatten
   end
   
-  def to_query key = nil
+  def to_query key
     prefix = "#{key}[]"
     collect { |value| value.to_query(prefix) }.flatten
   end
