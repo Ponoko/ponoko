@@ -72,26 +72,32 @@ class TestOrders < MiniTest::Unit::TestCase
   def test_shipping_options_address_fail
     order = Ponoko::Order.new
 
-    assert_raises Ponoko::PonokoAPIError do
+    e = assert_raises Ponoko::PonokoAPIError do
       order.shipping_options!
     end
+    
+    assert_equal "Order must have a Delivery Address", e.message
   end
   
   def test_make_an_order_with_no_params
     order = Ponoko::Order.new
     
-    assert_raises Ponoko::PonokoAPIError do
+    e = assert_raises Ponoko::PonokoAPIError do
       order.send!
     end
+
+    assert_equal "Order must have a Shipping Option Code", e.message
   end
   
   def test_make_an_order_with_no_products
     address = {"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}
     order = Ponoko::Order.new 'delivery_address' => address,  'shipping_option_code' => 'ups_ground'
     
-    assert_raises Ponoko::PonokoAPIError do
+    e = assert_raises Ponoko::PonokoAPIError do
       order.send!
     end
+
+    assert_equal "Order must have Products", e.message
   end
   
   def test_make_an_order_with_no_address
@@ -99,9 +105,11 @@ class TestOrders < MiniTest::Unit::TestCase
     product = Ponoko::Product.new 
     order.add_product product
     
-    assert_raises Ponoko::PonokoAPIError do
+    e = assert_raises Ponoko::PonokoAPIError do
       order.send!
     end
+    
+    assert_equal "Order must have a Delivery Address", e.message
   end
   
   def test_make_an_order_with_no_shipping_option
@@ -111,9 +119,11 @@ class TestOrders < MiniTest::Unit::TestCase
     product = Ponoko::Product.new
     order.add_product product
     
-    assert_raises Ponoko::PonokoAPIError do
+    e = assert_raises Ponoko::PonokoAPIError do
       order.send!
     end
+
+    assert_equal "Order must have a Shipping Option Code", e.message
   end
   
   def test_make_an_order

@@ -48,9 +48,11 @@ class TestProducts < MiniTest::Unit::TestCase
     product = Ponoko::Product.new
     assert product
     
-    assert_raises Ponoko::PonokoAPIError do
+    e = assert_raises Ponoko::PonokoAPIError do
       product.send!
     end
+
+    assert_equal "Product must have a design.", e.message
   end
 
   def test_make_a_product
