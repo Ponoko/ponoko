@@ -108,9 +108,11 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   def test_bump_order_state_not_on_sandbox
     ponoko = Ponoko::PonokoAPI.new @test_auth, :production
     
-    assert_raises Ponoko::PonokoAPIError do
+    e = assert_raises Ponoko::PonokoAPIError do
       ponoko.step_order 'order_key'
     end
+    
+    assert_equal "Ponoko API Sandbox only", e.message
     
     @test_auth.verify
   end
