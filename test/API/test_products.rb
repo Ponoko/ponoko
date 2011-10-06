@@ -83,6 +83,10 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     assert false
   end
   
+  def test_replace_design
+    assert false
+  end
+  
   def test_destroy_design
     assert false
   end
@@ -107,7 +111,11 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   end
   
   def test_destroy_design_image
-    assert false
+    @test_auth.expect(:post, @api_responses[:image_200], ['products/2413/design_images/destroy','filename=lamp-1_product_page.jpg'])
+
+    resp = @ponoko.destroy_design_image "2413", "lamp-1_product_page.jpg"
+
+    @test_auth.verify
   end
   
   def test_add_assembly_instructions
@@ -144,7 +152,11 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   end
   
   def test_destroy_assembly_instructions_file
-    assert false
+    @test_auth.expect :post, @api_responses[:assembly_200], ['products/2413/assembly_instructions/download','filename=instructions.txt']
+
+    resp = @ponoko.destroy_assembly_instructions "2413", "instructions.txt"
+
+    @test_auth.verify
   end
   
   def test_destroy_assembly_instructions_url
@@ -162,11 +174,22 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   end
 
   def test_update_hardware
-    assert false
+    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware','sku=COM-00680&quantity=3']
+    sku = 'COM-00680' # LED Light Bar - White
+    quantity = 99
+
+    resp = @ponoko.update_hardware "2413", {'sku' => sku, 'quantity' => quantity}
+
+    @test_auth.verify
   end
   
   def test_destroy_hardware
-    assert false
+    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware','sku=COM-00680&quantity=3']
+    sku = 'COM-00680' # LED Light Bar - White
+
+    resp = @ponoko.destroy_hardware "2413", 'sku' => sku
+
+    @test_auth.verify
   end
   
   def test_escape_params
@@ -175,6 +198,16 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     resp = @ponoko.get_products "fun%ky[] key"
 
     product = resp['product']
+
+    @test_auth.verify
+  end
+  
+  def test_server_exception
+    @test_auth.expect(:get, @api_responses[:ponoko_exception], ['products/', ""])
+
+    resp = @ponoko.get_products
+    
+    products = resp['products']
 
     @test_auth.verify
   end

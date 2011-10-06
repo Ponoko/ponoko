@@ -124,8 +124,8 @@ class MiniTest::Unit::TestCase
                                                                                 \"make_cost\":{\"total\":\"18.86\",
                                                                                                \"making\":\"16.02\",
                                                                                                \"materials\":\"2.84\",
-                                                                                               \"currency\":\"USD\"}}]}}")
-
+                                                                                               \"currency\":\"USD\"}}]}}"),
+      :ponoko_exception   => FakeHTTPResponse.new('500', "<html>Exceptions return HTML</html>")
     }
   end
   

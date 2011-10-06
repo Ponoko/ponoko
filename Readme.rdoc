@@ -73,7 +73,6 @@ using the bang ('!') versions of the calls.
 
  * Use the Money gem, maybe.
  * Improve exception messages.
- * Add the new API methods.
 
 ---
 
