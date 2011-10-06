@@ -1,6 +1,10 @@
 require 'pp'
 
-def hr; puts '-' * 80; end
+def hr label
+  puts '-' * 80
+  puts label
+  puts '-' * 80
+end
 
 $:.push File.dirname(__FILE__) + '/../lib/'
 require 'ponoko'
@@ -20,9 +24,7 @@ Ponoko.api = Ponoko::OAuthAPI.new env:             :sandbox,
 #                                   access_secret:   'bOAI6FJx1m8QbhPbAxy19orvCf9y1Kbk5rNinhyg'
 
 
-hr
-p "Nodes"
-hr
+hr "Nodes"
 
 nodes = Ponoko::Node.get!
 pp nodes
@@ -34,13 +36,15 @@ mc = node.material_catalogue
 pp mc
 
 
-hr
-p "Products"
-hr
+hr "Products"
 
 pp products = Ponoko::Product.get!
 
-pp Ponoko::Product.get! products.first.key unless products.empty?
+product = Ponoko::Product.get! products.first.key unless products.empty?
+
+pp product
+
+product.add_design_image! File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
 
 # product = Ponoko::Product.new 'ref' => 'product_ref-' + Time.new.to_s, 'name' => 'Product', 'description' => 'This is a product description'
 # 
@@ -57,9 +61,7 @@ pp Ponoko::Product.get! products.first.key unless products.empty?
 # pp product
 
 
-hr
-p "Orders"
-hr
+hr "Orders"
 
 orders = Ponoko::Order.get!
 pp orders
