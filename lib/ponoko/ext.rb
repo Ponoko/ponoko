@@ -70,8 +70,19 @@ module PonokoTrueClassExtensions
   end
 end
 
+module PonokoFalseClassExtensions
+  def to_multipart key
+    "Content-Disposition: form-data; name=\"#{key}\"\r\n\r\n" + 
+    "0\r\n"
+  end
+end
+
 module PonokoNilClassExtensions
   def to_query key = nil
+    ""
+  end
+
+  def to_multipart key = nil
     ""
   end
 end
@@ -102,6 +113,10 @@ end
 
 class TrueClass
   include PonokoTrueClassExtensions
+end
+
+class FalseClass
+  include PonokoFalseClassExtensions
 end
 
 class NilClass
