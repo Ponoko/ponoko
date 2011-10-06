@@ -260,6 +260,41 @@ module Ponoko
     end
 
   end
+  
+  class BasicAPI < PonokoAPI
+    def initialize params = {}
+      @auth_params = {'app_key' => params[:app_key], 'user_access_key' => params[:user_access_key]}
+      super self, params[:env]
+    end
+  
+    def get path
+      command = PONOKO_API_PATH + path + "?" + @auth_params.collect {|k,v| "#{k}=#{v}"}.join('&')
+
+      http = Net::HTTP.new(@base_uri.host, @base_uri.port)
+      http.use_ssl = true if @base_uri.port == 443
+      request = Net::HTTP::Get.new(command)
+      http.request(request)
+    end
+
+    def post path, params, headers = {}
+      command = PONOKO_API_PATH + path
+
+      http = Net::HTTP.new(@base_uri.host, @base_uri.port)
+      http.use_ssl = true if @base_uri.port == 443
+      request = Net::HTTP::Post.new(command)
+
+      request.body = params + '&' + @auth_params.collect {|k,v| "#{k}=#{v}"}.join('&')
+
+      unless headers.empty?
+        headers.each do |k,v|
+          request[k] = v
+        end
+      end
+      
+      http.request(request)
+    end
+  end
+  
 
 end # module Ponoko
 
