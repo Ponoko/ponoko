@@ -26,31 +26,26 @@ module Ponoko
     
     def get_nodes node_key = nil
       resp = @client.get "nodes/", node_key.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
     
     def get_material_catalogue node_key
       resp = @client.get "nodes/material-catalog/", node_key.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
     
     def get_orders key = nil
       resp = @client.get "orders/", key.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
     
     def get_shipping_options params
       resp = @client.get "orders/shipping_options?", params.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
     
     def get_order_status key
       resp = @client.get "orders/status/", key.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
     
@@ -58,19 +53,16 @@ module Ponoko
       raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
 
       resp = @client.get "orders/trigger-next-event/", key.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
         
     def post_order params
       resp = @client.post 'orders/', params.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse resp.body
     end
 
     def get_products key = nil
       resp = @client.get "products/", key.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
     
@@ -81,9 +73,12 @@ module Ponoko
       end.join('') + "--" + boundary + "--\r\n"
 
       resp = @client.post("products/", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
-
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
+    end
+    
+    def delete_product product_key
+      resp = @client.get "products/delete/", product_key.to_query
+      JSON.parse(resp.body)
     end
     
     def post_design product_key, params
@@ -93,8 +88,6 @@ module Ponoko
       end.join('') + "--" + boundary + "--\r\n"
 
       resp = @client.post("products/#{product_key}/designs", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
-
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
@@ -105,14 +98,11 @@ module Ponoko
       end.join('') + "--" + boundary + "--\r\n"
 
       resp = @client.post("products/#{product_key}/designs/update", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
-
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
     def destroy_design product_key, design_key
       resp = @client.post "products/#{product_key.to_query}/designs/#{design_key.to_query}/destroy"
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)
     end
     
@@ -126,20 +116,16 @@ module Ponoko
       end.join('') + "--" + boundary + "--\r\n"
 
       resp = @client.post "products/#{product_key.to_query}/design_images/", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
-
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
     def get_design_image product_key, filename
       resp = @client.get "products/#{product_key.to_query}/design_images/download", filename.to_query("filename")
-      handle_error resp unless resp.code =='200'
       resp.body
     end
     
     def destroy_design_image product_key, filename
-      resp = @client.post "products/#{product_key.to_query}/design_images/download", filename.to_query("filename")
-      handle_error resp unless resp.code =='200'
+      resp = @client.post "products/#{product_key.to_query}/design_images/destroy", filename.to_query("filename")
       resp.body
     end
     
@@ -150,56 +136,38 @@ module Ponoko
       end.join('') + "--" + boundary + "--\r\n"
 
       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
-
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
     def post_assembly_instructions_url product_key, params
       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
     def get_assembly_instructions key, filename
       resp = @client.get "products/#{key.to_query}/assembly_instructions/download", filename.to_query("filename")
-      handle_error resp unless resp.code =='200'
       resp.body
     end
     
     def destroy_assembly_instructions_url product_key, params
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params.to_query
-      handle_error resp unless resp.code =='200'
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", params.to_query
       JSON.parse(resp.body)      
     end
     
     def post_hardware product_key, hardware_params
       resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
     def update_hardware product_key, hardware_params
       resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
-      handle_error resp unless resp.code =='200'
       JSON.parse(resp.body)      
     end
     
     def destroy_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
-      handle_error resp unless resp.code =='200'
+      resp = @client.post "products/#{product_key.to_query}/hardware/destroy", hardware_params.to_query
       JSON.parse(resp.body)      
     end
-    
-    def handle_error resp
-      error = JSON.parse resp.body
-      warn error
-      error
-    rescue
-      raise PonokoAPIError, resp
-    end
-
-    private :handle_error
   end
     
   require 'oauth'
