@@ -1,7 +1,7 @@
 require 'rake/testtask'
 # require 'ponoko'
 
-include Rake::DSL
+# include Rake::DSL
 
 Rake::TestTask.new do |t|
   t.libs << 'test' << 'lib'
