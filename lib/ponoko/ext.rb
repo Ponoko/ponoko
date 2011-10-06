@@ -6,7 +6,7 @@ module PonokoArrayExtensions
   
   def to_query key
     prefix = "#{key}[]"
-    collect { |value| value.to_query(prefix) }.flatten
+    collect { |value| value.to_query(prefix) }.flatten.join '&'
   end
   
   def to_params
