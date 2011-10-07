@@ -57,7 +57,7 @@ module Ponoko
     end
         
     def post_order params
-      resp = @client.post 'orders/', params.to_query
+      resp = @client.post "orders/", params.to_query
       JSON.parse resp.body
     end
 
@@ -72,7 +72,7 @@ module Ponoko
         '--' + boundary + "\r\n" + p
       end.join('') + "--" + boundary + "--\r\n"
 
-      resp = @client.post("products/", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
+      resp = @client.post("products", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
       JSON.parse(resp.body)      
     end
     
@@ -135,7 +135,7 @@ module Ponoko
         '--' + boundary + "\r\n" + p
       end.join('') + "--" + boundary + "--\r\n"
 
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
       JSON.parse(resp.body)      
     end
     
@@ -235,8 +235,8 @@ module Ponoko
       super self, params[:env]
     end
   
-    def get path
-      command = PONOKO_API_PATH + path + "?" + @auth_params.collect {|k,v| "#{k}=#{v}"}.join('&')
+    def get path, params = nil
+      command = PONOKO_API_PATH + path + "?" + [params, @auth_params.to_query].join('&')
 
       http = Net::HTTP.new(@base_uri.host, @base_uri.port)
       http.use_ssl = true if @base_uri.port == 443
