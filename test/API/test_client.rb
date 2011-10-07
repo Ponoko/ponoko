@@ -11,6 +11,9 @@ class TestClient < MiniTest::Unit::TestCase
 
     # Just test if we can connect
     ponoko.get_nodes
+
+    ponoko.post_product
+
   end
   
   def test_error_handling
@@ -35,6 +38,16 @@ class TestClient < MiniTest::Unit::TestCase
 
     resp = ponoko.get_products "fun/ky[] key"
     p resp
+  end
+  def test_simple_auth
+    ponoko = Ponoko::BasicAPI.new env:             :production,
+                                  app_key:         'not an app', 
+                                  user_access_key: 'not a user'
+
+    # Just test that the call makes it to Ponoko. Don't care about the result
+    assert ponoko.get_products("fun/ky[] key"), "Just test that the call makes it to Ponoko. Don't care about the result"
+
+    p ponoko.post_product('key' => "fun/ky[] key")#, "Just test that the call makes it to Ponoko. Don't care about the result"
   end
   
 end
