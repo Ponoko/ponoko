@@ -15,7 +15,7 @@ module Ponoko
   class Sandbox
     def self.step_order order
       resp = Ponoko::api.step_order order.key
-      order.update resp['order']
+      order.update resp['order'] # FIXME fetch
     end
   end
 
@@ -42,35 +42,28 @@ module Ponoko
     end
 
     def self.get! key = nil
-#       resp = with_handle_error { Ponoko::api.send "get_#{ponoko_objects}", key }
-      resp = Ponoko::api.send "get_#{ponoko_objects}", key
+      resp = with_handle_error { Ponoko::api.send "get_#{ponoko_objects}", key }
+
       if key.nil?
-        resp[ponoko_objects].collect do |p|
+        resp[ponoko_objects].collect do |p| # FIXME fetch
           new(p)
         end
       else
-        new resp[ponoko_object]
+        new resp[ponoko_object] # FIXME fetch
       end
     end
     
     def update!
-      resp = Ponoko::api.send "get_#{self.class.ponoko_objects}", key
-      update resp[self.class.ponoko_object]
+      resp = Base::with_handle_error { Ponoko::api.send "get_#{self.class.ponoko_objects}", key }
+      update resp[self.class.ponoko_object] # FIXME fetch
     end
     
-      def with_handle_error
-        resp = JSON.parse yield
-      rescue
-        raise    
-      else
-        if resp['error']
-          fail PonokoAPIError, resp['message']
-        end
-        resp
-      end
+    def self.with_handle_error
+      resp = yield
+      fail PonokoAPIError, resp['error']['message'] if resp['error']
+      resp
+    end
     
-#     protected :with_handle_error
-        
   end
   
   class Product < Base
@@ -82,8 +75,9 @@ module Ponoko
     
     def send!
       raise Ponoko::PonokoAPIError, "Product must have a design." if designs.empty?
-      resp = Ponoko::api.post_product self.to_params
-      update resp['product']
+      resp = Base::with_handle_error { Ponoko::api.post_product self.to_params }
+
+      update resp['product'] # FIXME fetch
       self
     end
 
@@ -93,6 +87,12 @@ module Ponoko
       @hardware = []
       @assembly_instructions = []
       super params
+    end
+    
+    def delete
+      Ponoko::api.delete_product self.key
+      resp = Base::with_handle_error { Ponoko::api.post_product self.to_params }
+      nil
     end
     
     def locked?
@@ -128,18 +128,22 @@ module Ponoko
     end
     
     def add_design!
-      resp = Ponoko::api.post_design self.key, design
-      update resp['product']
+#       resp = Ponoko::api.post_design self.key, design
+      resp = Base::with_handle_error { Ponoko::api.post_design self.key, design }
+      update resp['product'] # FIXME fetch
     end
     
     def add_design_image file, default = false
-      resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
-      update resp['product']
+#       resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
+      resp = Base::with_handle_error { Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default} }
+      update resp['product'] # FIXME fetch
     end
     
     def add_design_image! file, default = false
-      resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
-      update resp['product']
+#       resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
+      resp = Base::with_handle_error { Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default} }
+      p resp
+      update resp['product'] # FIXME fetch
     end
     
     def get_design_image_file! filename
@@ -153,12 +157,12 @@ module Ponoko
         Ponoko::api.post_assembly_instructions self.key, {'file_url' => file_or_url}
       end
           
-      update resp['product']
+      update resp['product'] # FIXME fetch
     end
     
     def add_assembly_instructions! file_or_url
       resp = Ponoko::api.post_assembly_instructions self.key, {'uploaded_data' => file_or_url}
-      update resp['product']
+      update resp['product'] # FIXME fetch
     end
     
     def get_assembly_instructions_file! filename
@@ -168,7 +172,7 @@ module Ponoko
     def add_hardware hardware_or_sku, quantity
       if hardware_or_sku.is_a? String
         resp = Ponoko::api.post_hardware self.key, {'sku' => sku, 'quantity' => quantity}
-        update resp['product']
+        update resp['product'] # FIXME fetch
       else
         hardware << hardware_or_sku
       end
@@ -178,7 +182,7 @@ module Ponoko
 
     def add_hardware! sku, quantity
       resp = Ponoko::api.post_hardware self.key, {'sku' => sku, 'quantity' => quantity}
-      update resp['product']
+      update resp['product'] # FIXME fetch
     end
 
     def to_params
@@ -269,7 +273,7 @@ module Ponoko
       raise Ponoko::PonokoAPIError, "Order must have Products" if products.empty?
 
       resp = Ponoko::api.post_order self.to_params
-      update resp['order']
+      update resp['order'] # FIXME fetch
       self
     end
     
@@ -299,18 +303,18 @@ module Ponoko
     
     def status!
       resp = Ponoko::api.get_order_status key
-      update resp['order']
+      update resp['order'] # FIXME fetch
       status
     end
     
     def status
       status! if @events.empty?
-      @events.last['name']
+      @events.last['name'] # FIXME fetch
     end
     
     def shipping_options!
       resp = Ponoko::api.get_shipping_options self.to_params
-      resp['shipping_options']['options']
+      resp['shipping_options']['options'] # FIXME fetch
     end
     
     def to_params
