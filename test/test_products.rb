@@ -132,8 +132,8 @@ class TestProducts < MiniTest::Unit::TestCase
   def test_add_assembly_instructions_instructables
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
     @test_api.expect :post_assembly_instructions, 
-                    make_resp(:post_product_200), 
-                    [String, {"file_url" => url}]
+                      make_resp(:post_product_200), 
+                      [String, {"file_url" => url}]
 
     product = Ponoko::Product.new 'key' => "product_key"
     product.add_assembly_instructions url
@@ -153,8 +153,8 @@ class TestProducts < MiniTest::Unit::TestCase
   
   def test_add_hardware
     @test_api.expect :post_hardware, 
-                     make_resp(:hardware_200), 
-                     [String, {"sku" => "COM-00680", "quantity" => 3}]
+                      make_resp(:hardware_200), 
+                      [String, {"sku" => "COM-00680", "quantity" => 3}]
 
     product = Ponoko::Product.new 'key' => "product_key"
     sku = 'COM-00680' # LED Light Bar - White
