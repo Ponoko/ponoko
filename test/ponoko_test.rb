@@ -40,27 +40,27 @@ hr "Products"
 
 pp products = Ponoko::Product.get!
 
-product = Ponoko::Product.get! products.first.key unless products.empty?
+old_product = Ponoko::Product.get! products.first.key unless products.empty?
 
-pp product
+pp old_product
 
-product.add_design_image! File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
+# old_product.add_design_image! File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
 
-# product = Ponoko::Product.new 'ref' => 'product_ref-' + Time.new.to_s, 'name' => 'Product', 'description' => 'This is a product description'
-# 
-# file = File.new(File.dirname(__FILE__) + "/Fixtures/exclamation_lamp/3mm_acrylic-191x191mm.svg")
-# design = Ponoko::Design.new 'ref' => '42', 'design_file' => file
-# 
-# material = mc['Plastic']['Acrylic']['Red']['3.0 mm']['P2']
-# pp material
-# design.add_material material
-# 
-# product.add_designs design
-# 
-# product.send!
-# pp product
+new_product = Ponoko::Product.new 'ref' => 'product_ref-' + Time.new.to_s, 'name' => 'Product', 'description' => 'This is a product description'
 
+file = File.new(File.dirname(__FILE__) + "/Fixtures/exclamation_lamp/3mm_acrylic-191x191mm.svg")
+design = Ponoko::Design.new 'ref' => '42', 'design_file' => file
 
+material = mc['Plastic']['Acrylic']['Red']['3.0 mm']['P2']
+pp material
+design.add_material material
+
+new_product.add_designs design
+
+new_product.send!
+pp new_product
+
+exit
 hr "Orders"
 
 orders = Ponoko::Order.get!

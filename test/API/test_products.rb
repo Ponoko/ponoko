@@ -75,22 +75,47 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     
   end
   
+#   v2.connect 'products/:product_id/add_design',                     {:controller => :products,  :action => :add_design}
   def test_add_design
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+
+    resp = @ponoko.post_design "2413", params
+
+    @test_auth.verify
     assert false
   end
   
+#   v2.connect 'products/:id/update_design/:design_id.:format',       {:controller => "products", :action => "update_design"}  # Rails 3 will save us
   def test_update_design
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+
+    resp = @ponoko.update_design "2413", params
+
+    @test_auth.verify
     assert false
   end
   
+#   v2.connect 'products/:product_id/replace_design/:id.:format',     {:controller => :products,  :action => :replace_design}        
   def test_replace_design
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+
+    resp = @ponoko.replace_design "2413", params
+
+    @test_auth.verify
     assert false
   end
   
+#   v2.connect 'products/:product_id/delete_design/:id.:format',      {:controller => :products,  :action => :delete_design}
   def test_destroy_design
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+
+    resp = @ponoko.destroy_design "2413", design_key
+
+    @test_auth.verify
     assert false
   end
   
+#   v2.connect 'products/:product_id/design_images',                  {:controller => :design_images,  :action => :new}
   def test_add_design_image
     @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_design_images', "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
 
@@ -101,6 +126,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file}
   end
   
+#   v2.connect 'products/:product_id/design_images/download',         {:controller => :design_images,  :action => :download}
   def test_get_design_image
     @test_auth.expect(:get, @api_responses[:image_200], ['products/2413/design_images/download','filename=lamp-1_product_page.jpg'])
 
@@ -110,6 +136,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     assert_equal "The contents of an image file", resp
   end
   
+#   v2.connect 'products/:product_id/design_images/destroy',          {:controller => :design_images,  :action => :destroy}
   def test_destroy_design_image
     @test_auth.expect(:post, @api_responses[:image_200], ['products/2413/design_images/destroy','filename=lamp-1_product_page.jpg'])
 
@@ -118,6 +145,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     @test_auth.verify
   end
   
+#   v2.connect 'products/:product_id/assembly_instructions',          {:controller => :assembly_instructions,  :action => :new}
   def test_add_assembly_instructions
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"uploaded_data\"; filename=\"instructions.txt\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.txt\r\n\r\nA test assembly instruction file.\n\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
 
@@ -138,6 +166,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     @test_auth.verify
   end
   
+#   v2.connect 'products/:product_id/assembly_instructions/download', {:controller => :assembly_instructions,  :action => :download}
   def test_get_assembly_instructions_file
     @test_auth.expect :get, @api_responses[:assembly_200], ['products/2413/assembly_instructions/download','filename=instructions.txt']
 
@@ -151,8 +180,9 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     assert false
   end
   
+#   v2.connect 'products/:product_id/assembly_instructions/destroy',  {:controller => :assembly_instructions,  :action => :destroy}
   def test_destroy_assembly_instructions_file
-    @test_auth.expect :post, @api_responses[:assembly_200], ['products/2413/assembly_instructions/download','filename=instructions.txt']
+    @test_auth.expect :post, @api_responses[:assembly_200], ['products/2413/assembly_instructions/destroy','filename=instructions.txt']
 
     resp = @ponoko.destroy_assembly_instructions "2413", "instructions.txt"
 
@@ -163,8 +193,9 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     assert false
   end
   
+#   v2.connect 'products/:product_id/hardware',                       {:controller => :hardware,  :action => :new}
   def test_add_hardware
-    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware','sku=COM-00680&quantity=3']
+    @test_auth.expect :post, @api_responses[:hardware_200],  ['products/2413/hardware','sku=COM-00680&quantity=3']
     sku = 'COM-00680' # LED Light Bar - White
     quantity = 3
 
@@ -173,8 +204,9 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     @test_auth.verify
   end
 
+#   v2.connect 'products/:product_id/hardware/update',                {:controller => :hardware,  :action => :update}
   def test_update_hardware
-    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware','sku=COM-00680&quantity=3']
+    @test_auth.expect :post, @api_responses[:hardware_200],  ['products/2413/hardware/update','sku=COM-00680&quantity=99']
     sku = 'COM-00680' # LED Light Bar - White
     quantity = 99
 
@@ -183,8 +215,9 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     @test_auth.verify
   end
   
+#   v2.connect 'products/:product_id/hardware/destroy',               {:controller => :hardware,  :action => :destroy}
   def test_destroy_hardware
-    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware','sku=COM-00680&quantity=3']
+    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware/destroy','sku=COM-00680']
     sku = 'COM-00680' # LED Light Bar - White
 
     resp = @ponoko.destroy_hardware "2413", 'sku' => sku
@@ -205,9 +238,9 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   def test_server_exception
     @test_auth.expect(:get, @api_responses[:ponoko_exception], ['products/', ""])
 
-    resp = @ponoko.get_products
-    
-    products = resp['products']
+    assert_raises JSON::ParserError do
+      resp = @ponoko.get_products
+    end    
 
     @test_auth.verify
   end
