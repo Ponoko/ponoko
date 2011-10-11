@@ -59,7 +59,7 @@ class TestProducts < MiniTest::Unit::TestCase
     file = File.new(File.dirname(__FILE__) + "/fixtures/small.svg")
     @test_api.expect :post_product, 
                       make_resp(:post_product_200), 
-                      [{"ref" => "product_ref", "name"=>"Product", "description"=>"This is a product description", "designs"=>[{"uploaded_data" => file, "ref"=>"42", "material_key"=>"6bb50fd03269012e3526404062cdb04a"}]}]
+                      [{"ref" => "product_ref", "name"=>"Product", "description"=>"This is a product description", "designs"=>[{"file_name" => "small.svg", "uploaded_data" => file, "ref"=>"42", "material_key"=>"6bb50fd03269012e3526404062cdb04a"}]}]
 
     product = Ponoko::Product.new 'ref' => 'product_ref', 'name' => 'Product', 'description' => 'This is a product description'
 
@@ -170,6 +170,15 @@ class TestProducts < MiniTest::Unit::TestCase
     assert_equal 3, product.hardware.first.quantity
   end
   
+  def test_server_exception
+    @test_api.expect(:get, @api_responses[:ponoko_exception], ['products/', ""])
+
+    assert_raises JSON::ParserError do
+      resp = @ponoko.get_products
+    end    
+
+    @test_auth.verify
+  end
 end
 
 

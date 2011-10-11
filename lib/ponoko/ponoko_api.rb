@@ -77,19 +77,27 @@ module Ponoko
       resp = @client.get "products/delete/", product_key.to_query
       JSON.parse(resp.body)
     end
-    
+
     def post_design product_key, params
-      resp = @client.post "products/#{product_key}/designs", params, :multipart
+      resp = @client.post "products/#{product_key.to_query}/add_design", params, :multipart
       JSON.parse(resp.body)      
     end
     
+#   v2.connect 'products/:id/update_design/:design_id.:format',       {:controller => "products", :action => "update_design"}  # Rails 3 will save us
     def update_design product_key, params
-      resp = @client.post "products/#{product_key}/designs/update", params, :multipart
+      resp = @client.post "products/#{product_key.to_query}/update_design", params, :multipart
       JSON.parse(resp.body)      
     end
     
+#   v2.connect 'products/:product_id/replace_design/:id.:format',     {:controller => :products,  :action => :replace_design}        
+    def replace_design product_key, params
+      resp = @client.post "products/#{product_key.to_query}/replace_design", params, :multipart
+      JSON.parse(resp.body)      
+    end
+    
+#   v2.connect 'products/:product_id/delete_design/:id.:format',      {:controller => :products,  :action => :delete_design}
     def destroy_design product_key, design_key
-      resp = @client.post "products/#{product_key.to_query}/designs/#{design_key.to_query}/destroy"
+      resp = @client.post "products/#{product_key.to_query}/delete_design", design_key.to_query
       JSON.parse(resp.body)
     end
     
@@ -126,8 +134,13 @@ module Ponoko
       resp.body
     end
     
-    def destroy_assembly_instructions_url product_key, params
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", params.to_query
+    def destroy_assembly_instructions product_key, filename
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", filename.to_query("filename")
+      JSON.parse(resp.body)      
+    end
+    
+    def destroy_assembly_instructions_url product_key, url
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", url.to_query("url")
       JSON.parse(resp.body)      
     end
     
@@ -137,7 +150,7 @@ module Ponoko
     end
     
     def update_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
+      resp = @client.post "products/#{product_key.to_query}/hardware/update", hardware_params.to_query
       JSON.parse(resp.body)      
     end
     

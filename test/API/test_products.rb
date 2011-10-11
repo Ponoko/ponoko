@@ -47,7 +47,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   end
   
   def test_api_make_a_product_missing_design
-    @test_auth.expect :post, @api_responses[:product_missing_design_400], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+    @test_auth.expect :post, @api_responses[:product_missing_design_400], ["products", {:name=>"Product", :notes=>"This is a product description", :ref=>"product_ref"}, :multipart]
 
     resp = @ponoko.post_product({:name => 'Product', :notes => 'This is a product description', :ref => 'product_ref'})
 
@@ -56,11 +56,13 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   end
 
   def test_api_make_a_product
-    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+    file = File.new(File.dirname(__FILE__) + "/../fixtures/small.svg")
+
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products", {:name => 'Product', :notes => 'This is a product description', :ref => 'product_ref', :designs => [{"file_name"=>"small.svg", :uploaded_data => file, :ref => '42', :material_key => '6bb50fd03269012e3526404062cdb04a'}]}, :multipart]
     
     file = File.new(File.dirname(__FILE__) + "/../fixtures/small.svg")
     resp = @ponoko.post_product({:name => 'Product', :notes => 'This is a product description', :ref => 'product_ref',
-                                :designs => [{:uploaded_data => file, :ref => '42', :material_key => '6bb50fd03269012e3526404062cdb04a'}]})
+                                :designs => [{'file_name' => 'small.svg', :uploaded_data => file, :ref => '42', :material_key => '6bb50fd03269012e3526404062cdb04a'}]})
 
     @test_auth.verify
 
@@ -77,7 +79,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
 #   v2.connect 'products/:product_id/add_design',                     {:controller => :products,  :action => :add_design}
   def test_add_design
-    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/add_design", {}, :multipart]
 
     resp = @ponoko.post_design "2413", {}
 
@@ -87,7 +89,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
 #   v2.connect 'products/:id/update_design/:design_id.:format',       {:controller => "products", :action => "update_design"}  # Rails 3 will save us
   def test_update_design
-    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/update_design", {}, :multipart]
 
     resp = @ponoko.update_design "2413", {}
 
@@ -97,7 +99,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
 #   v2.connect 'products/:product_id/replace_design/:id.:format',     {:controller => :products,  :action => :replace_design}        
   def test_replace_design
-    @test_auth.expect :post, @api_responses[:post_product_200], ["products/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[][material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/replace_design", {}, :multipart]
 
     resp = @ponoko.replace_design "2413", {}
 
@@ -107,7 +109,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
 #   v2.connect 'products/:product_id/delete_design/:id.:format',      {:controller => :products,  :action => :delete_design}
   def test_destroy_design
-    @test_auth.expect :post, @api_responses[:post_product_200], [1,2]
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/delete_design", "666"]
 
     resp = @ponoko.destroy_design "2413", "666"
 
@@ -117,13 +119,18 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
 #   v2.connect 'products/:product_id/design_images',                  {:controller => :design_images,  :action => :new}
   def test_add_design_image
-    @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_design_images', "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nProduct\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"notes\"\r\n\r\nThis is a product description\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"ref\"\r\n\r\nproduct_ref\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[uploaded_data]\"; filename=\"small.svg\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.svg\r\n\r\nthis is a small file\n\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[ref]\"\r\n\r\n42\r\n--arandomstringofletters\r\nContent-Disposition: form-data; name=\"designs[material_key]\"\r\n\r\n6bb50fd03269012e3526404062cdb04a\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
-
     image_file_default = File.new(File.dirname(__FILE__) + "/../fixtures/lamp-1_product_page.jpg")
     image_file = File.new(File.dirname(__FILE__) + "/../fixtures/3d-1_product_page.jpg")
 
+    @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_design_images', {:uploaded_data => image_file_default, :default => true}, :multipart]
+    @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_design_images', {:uploaded_data => image_file}, :multipart]
+
+
     resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file_default, :default => true}
     resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file}
+
+    @test_auth.verify
+    assert false
   end
   
 #   v2.connect 'products/:product_id/design_images/download',         {:controller => :design_images,  :action => :download}
@@ -138,22 +145,23 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
 #   v2.connect 'products/:product_id/design_images/destroy',          {:controller => :design_images,  :action => :destroy}
   def test_destroy_design_image
-    @test_auth.expect(:post, @api_responses[:image_200], ['products/2413/design_images/destroy','filename=lamp-1_product_page.jpg'])
+    @test_auth.expect(:post, @api_responses[:product_200], ['products/2413/design_images/destroy','filename=lamp-1_product_page.jpg'])
 
     resp = @ponoko.destroy_design_image "2413", "lamp-1_product_page.jpg"
 
     @test_auth.verify
+    assert false
   end
   
 #   v2.connect 'products/:product_id/assembly_instructions',          {:controller => :assembly_instructions,  :action => :new}
   def test_add_assembly_instructions
-    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", "--arandomstringofletters\r\nContent-Disposition: form-data; name=\"uploaded_data\"; filename=\"instructions.txt\"\r\nContent-Transfer-Encoding: binary\r\nContent-Type: application/.txt\r\n\r\nA test assembly instruction file.\n\r\n--arandomstringofletters--\r\n", {"Content-Type"=>"multipart/form-data; boundary=arandomstringofletters"}]
-
     file = File.new(File.dirname(__FILE__) + "/../fixtures/instructions.txt")
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", {:uploaded_data => file}, :multipart]
+
     resp = @ponoko.post_assembly_instructions_file "2413", :uploaded_data => file
 
-    assert resp
     @test_auth.verify
+    assert false
   end
   
   def test_add_assembly_instructions_instructables
@@ -162,8 +170,8 @@ class TestAPIProducts < MiniTest::Unit::TestCase
 
     resp = @ponoko.post_assembly_instructions_url '2413', :file_url => url
 
-    assert resp
     @test_auth.verify
+    assert false
   end
   
 #   v2.connect 'products/:product_id/assembly_instructions/download', {:controller => :assembly_instructions,  :action => :download}
@@ -182,14 +190,20 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
 #   v2.connect 'products/:product_id/assembly_instructions/destroy',  {:controller => :assembly_instructions,  :action => :destroy}
   def test_destroy_assembly_instructions_file
-    @test_auth.expect :post, @api_responses[:assembly_200], ['products/2413/assembly_instructions/destroy','filename=instructions.txt']
+    @test_auth.expect :post, @api_responses[:product_200], ['products/2413/assembly_instructions/destroy','filename=instructions.txt']
 
     resp = @ponoko.destroy_assembly_instructions "2413", "instructions.txt"
 
     @test_auth.verify
+    assert false
   end
   
   def test_destroy_assembly_instructions_url
+    @test_auth.expect :post, @api_responses[:product_200], ['products/2413/assembly_instructions/destroy','url=instructions.txt']
+
+    resp = @ponoko.destroy_assembly_instructions_url "2413", "instructions.txt"
+
+    @test_auth.verify
     assert false
   end
   
@@ -202,6 +216,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     resp = @ponoko.post_hardware "2413", {'sku' => sku, 'quantity' => quantity}
 
     @test_auth.verify
+    assert false
   end
 
 #   v2.connect 'products/:product_id/hardware/update',                {:controller => :hardware,  :action => :update}
@@ -213,6 +228,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     resp = @ponoko.update_hardware "2413", {'sku' => sku, 'quantity' => quantity}
 
     @test_auth.verify
+    assert false
   end
   
 #   v2.connect 'products/:product_id/hardware/destroy',               {:controller => :hardware,  :action => :destroy}
@@ -223,6 +239,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     resp = @ponoko.destroy_hardware "2413", 'sku' => sku
 
     @test_auth.verify
+    assert false
   end
   
   def test_escape_params
@@ -233,6 +250,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     product = resp['product']
 
     @test_auth.verify
+    assert false
   end
   
   def test_server_exception
