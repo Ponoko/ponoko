@@ -9,6 +9,7 @@ end
 $:.push File.dirname(__FILE__) + '/../lib/'
 require 'ponoko'
 
+hr Ponoko::VERSION
 
 Ponoko.api = Ponoko::OAuthAPI.new env:             :sandbox,
                                   consumer_key:    'd2KxglROLzixJ53NAwTRVoAVMsmJZ5X7BxjfS7fc', 
@@ -25,7 +26,6 @@ Ponoko.api = Ponoko::OAuthAPI.new env:             :sandbox,
 
 
 hr "Nodes"
-
 nodes = Ponoko::Node.get!
 pp nodes
 
@@ -37,7 +37,6 @@ pp mc
 
 
 hr "Products"
-
 pp products = Ponoko::Product.get!
 
 old_product = Ponoko::Product.get! products.first.key unless products.empty?
@@ -57,12 +56,13 @@ design.add_material material
 
 new_product.add_designs design
 
+hr "Create Product"
 new_product.send!
 pp new_product
 
 exit
-hr "Orders"
 
+hr "Orders"
 orders = Ponoko::Order.get!
 pp orders
 

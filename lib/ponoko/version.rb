@@ -1,3 +1,3 @@
 module Ponoko
-  VERSION = "0.4"
+  VERSION = "0.6"
 end

@@ -27,20 +27,29 @@ class TestExt < MiniTest::Unit::TestCase
   end
   
   def test_string_to_multipart
-    assert_equal "Content-Disposition: form-data; name=\"A test key\"\r\n\r\nA test string\r\n", "A test string".to_multipart("A test key")
+    assert_equal "Content-Disposition: form-data; name=\"A string\"\r\n\r\nA test string\r\n", "A test string".to_multipart("A string")
   end
   
   def test_array_to_multipart
     a = ["A test key", "A test string"]
-    assert_equal ["Content-Disposition: form-data; name=\"A test[]\"\r\n\r\nA test key\r\n",
-                  "Content-Disposition: form-data; name=\"A test[]\"\r\n\r\nA test string\r\n"], a.to_multipart("A test")
+    assert_equal ["Content-Disposition: form-data; name=\"An array[]\"\r\n\r\nA test key\r\n",
+                  "Content-Disposition: form-data; name=\"An array[]\"\r\n\r\nA test string\r\n"], a.to_multipart("An array")
   end
 
   def test_hash_to_multipart
     h = {"A test key" => "A test string"}
     assert_equal ["Content-Disposition: form-data; name=\"A test key\"\r\n\r\nA test string\r\n"], h.to_multipart
 
-    assert_equal ["Content-Disposition: form-data; name=\"A test[A test key]\"\r\n\r\nA test string\r\n"], h.to_multipart("A test")
+    assert_equal ["Content-Disposition: form-data; name=\"A hash[A test key]\"\r\n\r\nA test string\r\n"], h.to_multipart("A hash")
+  end
+  
+  def test_blank
+    a = ["A test key", nil]
+    assert_equal ["Content-Disposition: form-data; name=\"An array[]\"\r\n\r\nA test key\r\n"], a.to_multipart("An array")
+  
+    h = {"A test key" => nil, "key" => "value"}
+    assert_equal ["Content-Disposition: form-data; name=\"key\"\r\n\r\nvalue\r\n"], h.to_multipart
+  
   end
 
 end

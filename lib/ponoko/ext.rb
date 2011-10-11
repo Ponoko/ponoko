@@ -1,7 +1,7 @@
 module PonokoArrayExtensions
   def to_multipart key
     prefix = "#{key}[]"
-    collect {|a| a.to_multipart(prefix)}.flatten
+    collect {|a| a.to_multipart(prefix)}.flatten.compact
   end
   
   def to_query key
@@ -16,7 +16,7 @@ end
 
 module PonokoHashExtensions
   def to_multipart key = nil
-    collect {|k, v| v.to_multipart(key ? "#{key}[#{k}]" : k)}.flatten
+    collect {|k, v| v.to_multipart(key ? "#{key}[#{k}]" : k)}.flatten.compact
   end
   
   def to_query key = nil
@@ -83,7 +83,7 @@ module PonokoNilClassExtensions
   end
 
   def to_multipart key = nil
-    ""
+    nil
   end
 end
 

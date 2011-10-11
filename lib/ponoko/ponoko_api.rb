@@ -9,6 +9,8 @@ module Ponoko
   class PonokoAPIError < StandardError; end
   
   class PonokoAPI
+    attr :debug
+    
     PONOKO_API_PATH = '/services/api/v2/'
 
     def initialize client, env = :sandbox
@@ -67,12 +69,7 @@ module Ponoko
     end
     
     def post_product params
-      boundary = "arandomstringofletters"
-      query = params.to_multipart.collect do |p|
-        '--' + boundary + "\r\n" + p
-      end.join('') + "--" + boundary + "--\r\n"
-
-      resp = @client.post("products", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
+      resp = @client.post "products", params, :multipart
       JSON.parse(resp.body)      
     end
     
@@ -82,22 +79,12 @@ module Ponoko
     end
     
     def post_design product_key, params
-      boundary = "arandomstringofletters"
-      query = params.to_multipart.collect do |p|
-        '--' + boundary + "\r\n" + p
-      end.join('') + "--" + boundary + "--\r\n"
-
-      resp = @client.post("products/#{product_key}/designs", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
+      resp = @client.post "products/#{product_key}/designs", params, :multipart
       JSON.parse(resp.body)      
     end
     
     def update_design product_key, params
-      boundary = "arandomstringofletters"
-      query = params.to_multipart.collect do |p|
-        '--' + boundary + "\r\n" + p
-      end.join('') + "--" + boundary + "--\r\n"
-
-      resp = @client.post("products/#{product_key}/designs/update", query, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"})
+      resp = @client.post "products/#{product_key}/designs/update", params, :multipart
       JSON.parse(resp.body)      
     end
     
@@ -110,12 +97,7 @@ module Ponoko
       # products/3c479d62f2dae6e703861e50d4271efc/design_images
       # design_images[][uploaded_data]
       # design_images[][default]
-      boundary = "arandomstringofletters"
-      q = image_params.to_multipart.collect do |p|
-        '--' + boundary + "\r\n" + p
-      end.join('') + "--" + boundary + "--\r\n"
-
-      resp = @client.post "products/#{product_key.to_query}/design_images/", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+      resp = @client.post "products/#{product_key.to_query}/design_images/", image_params, :multipart
       JSON.parse(resp.body)      
     end
     
@@ -130,12 +112,7 @@ module Ponoko
     end
     
     def post_assembly_instructions_file product_key, params
-      boundary = "arandomstringofletters"
-      q = params.to_multipart.collect do |p|
-        '--' + boundary + "\r\n" + p
-      end.join('') + "--" + boundary + "--\r\n"
-
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions", q, {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions", params, :multipart
       JSON.parse(resp.body)      
     end
     
@@ -192,8 +169,20 @@ module Ponoko
       @access.get PONOKO_API_PATH + path + params
     end
     
-    def post path, params, headers = {}
-      @access.post PONOKO_API_PATH + path, params, headers
+    def post path, params, multipart = false
+      if multipart
+        boundary = "~~~~~arandomstringofletters"    
+        headers = {'Content-Type' => "multipart/form-data; boundary=#{boundary}"}
+        
+        query   = "--#{boundary}\r\n" + 
+                  params.to_multipart.join('--' + boundary + "\r\n") + 
+                  "--#{boundary}--\r\n"
+      else
+        headers = ""
+        query = params.to_query
+      end
+            
+      @access.post PONOKO_API_PATH + path, query, headers
     end
     
     def self.authorize
@@ -202,13 +191,12 @@ module Ponoko
 
       print "Enter consumer secret: "
       consumer_secret = $stdin.gets.chomp
-      
-      
+
       consumer = OAuth::Consumer.new(consumer_key,          consumer_secret,
                                      site:                  'https://www.ponoko.com/',
-                                     request_token_path:    "/oauth/request_token",
-                                     access_token_path:     "/oauth/access_token",
-                                     authorize_path:        "/oauth/authorize")
+                                     request_token_path:    '/oauth/request_token',
+                                     access_token_path:     '/oauth/access_token',
+                                     authorize_path:        '/oauth/authorize')
       
       
 
@@ -232,34 +220,59 @@ module Ponoko
   class BasicAPI < PonokoAPI
     def initialize params = {}
       @auth_params = {'app_key' => params[:app_key], 'user_access_key' => params[:user_access_key]}
+      @debug = params[:debug]
       super self, params[:env]
     end
   
     def get path, params = nil
-      command = PONOKO_API_PATH + path + "?" + [params, @auth_params.to_query].join('&')
-
+      command = PONOKO_API_PATH + path + params + '?' + @auth_params.to_query
+      p command if @debug
+      
       http = Net::HTTP.new(@base_uri.host, @base_uri.port)
       http.use_ssl = true if @base_uri.port == 443
       request = Net::HTTP::Get.new(command)
-      http.request(request)
+      
+      resp = http.request(request)
+
+      if @debug
+        p resp
+        p resp.body
+      end
+
+      resp
     end
 
-    def post path, params, headers = {}
+    def post path, params, multipart = false
       command = PONOKO_API_PATH + path
-
+      p command if @debug
+      p params if @debug
+      
+      
       http = Net::HTTP.new(@base_uri.host, @base_uri.port)
       http.use_ssl = true if @base_uri.port == 443
       request = Net::HTTP::Post.new(command)
 
-      request.body = params + '&' + @auth_params.collect {|k,v| "#{k}=#{v}"}.join('&')
+      if multipart
+        boundary = "~~~~~arandomstringofletters"
+        request['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
 
-      unless headers.empty?
-        headers.each do |k,v|
-          request[k] = v
-        end
+        request.body   = "--#{boundary}\r\n" + 
+                         @auth_params.merge(params).to_multipart.join('--' + boundary + "\r\n") + 
+                         "--#{boundary}--\r\n"
+      else
+        request.body = @auth_params.merge(params).to_query
       end
       
-      http.request(request)
+      p request.body if @debug
+      
+      resp = http.request(request)
+      
+      if @debug
+        p resp
+        p resp.body
+      end
+      
+      resp
     end
   end
   
