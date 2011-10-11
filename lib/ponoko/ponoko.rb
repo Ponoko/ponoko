@@ -4,14 +4,8 @@ require 'uri'
 require 'ponoko/ponoko_api.rb'
 
 module Ponoko
-  def self.api= a
-    @api = a
-  end
-  
-  def self.api
-    @api
-  end
-  
+  class << self; attr_accessor :api end
+
   class Sandbox
     def self.step_order order
       resp = Ponoko::api.step_order order.key
@@ -61,7 +55,10 @@ module Ponoko
     def self.with_handle_error
       resp = yield
       fail PonokoAPIError, resp['error']['message'] if resp['error']
+
       resp
+    rescue JSON::ParserError
+      fail PonokoAPIError, "Ponoko returned an invalid response."
     end
     
   end
@@ -229,7 +226,7 @@ module Ponoko
     
     def to_params
       raise Ponoko::PonokoAPIError, "Design must have a Material." if material.nil?
-      {'uploaded_data' => design_file, 'ref' => ref, 'material_key' => material.to_params}
+      {'file_name' => File.basename(design_file), 'uploaded_data' => design_file, 'ref' => ref, 'material_key' => material.to_params}
     end   
   end
   
