@@ -26,6 +26,14 @@ module Ponoko
         end
     end
     
+    def make_request
+      resp = yield
+      
+      fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'" if resp.code.to_i > 499
+
+      resp
+    end
+    
     def get_nodes node_key = nil
       resp = @client.get "nodes/", node_key.to_query
       JSON.parse(resp.body)
@@ -265,7 +273,11 @@ module Ponoko
       http.use_ssl = true if @base_uri.port == 443
       request = Net::HTTP::Post.new(command)
 
+      http.read_timeout = 3600
+      http.open_timeout = 3600
+
       if multipart
+        # FIXME split this out
         boundary = "~~~~~arandomstringofletters"
         request['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
 
@@ -288,7 +300,6 @@ module Ponoko
       resp
     end
   end
-  
 
 end # module Ponoko
 
