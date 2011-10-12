@@ -58,7 +58,7 @@ module Ponoko
 
       resp
     rescue JSON::ParserError
-      fail PonokoAPIError, "Ponoko returned an invalid response."
+      fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'"
     end
     
   end
