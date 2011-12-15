@@ -35,8 +35,7 @@ module PonokoStringExtensions
   end
   
   def to_query key = nil
-    key ? URI.escape("#{key}=#{self}")
-        : URI.escape(self)
+    key ? URI.escape("#{key}=#{self}") : URI.escape(self)
   end
 end
 
@@ -51,15 +50,13 @@ end
 
 module PonokoFixnumExtensions
   def to_query key = nil
-    key ? URI.escape("#{key}=#{self}")
-        : URI.escape(self)
+    key ? URI.escape("#{key}=#{self}") : URI.escape(self)
   end
 end
 
 module PonokoFloatExtensions
   def to_query key = nil
-    key ? URI.escape("#{key}=#{self}")
-        : URI.escape(self)
+    key ? URI.escape("#{key}=#{self}") : URI.escape(self)
   end
 end
 

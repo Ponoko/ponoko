@@ -175,13 +175,13 @@ module Ponoko
       super self, params[:env]
 
       consumer = OAuth::Consumer.new(params[:consumer_key], params[:consumer_secret],
-                                     site:                  @base_uri,
-                                     request_token_path:    "/oauth/request_token",
-                                     access_token_path:     "/oauth/access_token",
-                                     authorize_path:        "/oauth/authorize")
+                                     :site                => @base_uri,
+                                     :request_token_path  => "/oauth/request_token",
+                                     :access_token_path   => "/oauth/access_token",
+                                     :authorize_path      => "/oauth/authorize")
     
-      access_keys = {oauth_token:           params[:access_token], 
-                     oauth_token_secret:    params[:access_secret]}
+      access_keys = {:oauth_token         => params[:access_token], 
+                     :oauth_token_secret  => params[:access_secret]}
     
       @access = OAuth::AccessToken.from_hash(consumer, access_keys)
     end
@@ -214,10 +214,10 @@ module Ponoko
       consumer_secret = $stdin.gets.chomp
 
       consumer = OAuth::Consumer.new(consumer_key,          consumer_secret,
-                                     site:                  'https://www.ponoko.com/',
-                                     request_token_path:    '/oauth/request_token',
-                                     access_token_path:     '/oauth/access_token',
-                                     authorize_path:        '/oauth/authorize')
+                                     :site                => 'https://www.ponoko.com/',
+                                     :request_token_path  => '/oauth/request_token',
+                                     :access_token_path   => '/oauth/access_token',
+                                     :authorize_path      => '/oauth/authorize')
       
       
 
