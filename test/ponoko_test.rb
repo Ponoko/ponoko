@@ -60,7 +60,7 @@ hr "Create Product"
 new_product.send!
 pp new_product
 
-exit
+# exit
 
 hr "Orders"
 orders = Ponoko::Order.get!

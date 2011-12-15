@@ -55,7 +55,6 @@ module Ponoko
     def self.with_handle_error
       resp = yield
       fail PonokoAPIError, resp['error']['message'] if resp['error']
-
       resp
     rescue JSON::ParserError
       fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'"
@@ -167,7 +166,7 @@ module Ponoko
     end
     
     def add_hardware hardware_or_sku, quantity
-      if hardware_or_sku.is_a? String
+      if hardware_or_sku.is_a? String # FIXME!
         resp = Ponoko::api.post_hardware self.key, {'sku' => sku, 'quantity' => quantity}
         update resp['product'] # FIXME fetch
       else
@@ -354,7 +353,7 @@ module Ponoko
 
       if @material_catalogue.nil? or materials_updated_at > materials_date
         resp = Ponoko::api.get_material_catalogue key
-        raise Ponoko::PonokoAPIError, "Unknown Error Occurred" unless key ==  resp['key']
+        raise Ponoko::PonokoAPIError, "Unknown Error Occurred" unless key == resp['key']
         update resp
       end
       

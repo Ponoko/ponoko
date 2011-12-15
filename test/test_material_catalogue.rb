@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + "/test_helper")
+require 'test_helper'
 
 class TestMaterialCatalogue < MiniTest::Unit::TestCase
   def test_construct_material_catalogue
