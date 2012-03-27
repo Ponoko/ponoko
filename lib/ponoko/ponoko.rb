@@ -230,7 +230,7 @@ module Ponoko
   end
   
   class Material < Base
-    attr_accessor :type, :weight, :color, :thickness, :name, :width, :material_type
+    attr_accessor :type, :weight, :color, :thickness, :name, :width, :material_type, :dimensions
     attr_accessor :length, :kind
     attr_accessor :updated_at
     
