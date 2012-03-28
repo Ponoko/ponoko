@@ -269,9 +269,9 @@ module Ponoko
       
       
       http = Net::HTTP.new(@base_uri.host, @base_uri.port)
-      http.use_ssl = true if @base_uri.port == 443
       request = Net::HTTP::Post.new(command)
 
+      http.use_ssl = true if @base_uri.port == 443
       http.read_timeout = 3600
       http.open_timeout = 3600
 
