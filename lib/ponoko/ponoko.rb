@@ -138,7 +138,6 @@ module Ponoko
     def add_design_image! file, default = false
 #       resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
       resp = Base::with_handle_error { Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default} }
-      p resp
       update resp['product'] # FIXME fetch
     end
     
