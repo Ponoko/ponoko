@@ -64,7 +64,7 @@ module Ponoko
   
   class Product < Base
     attr_accessor :name, :description, :materials_available, :locked, :total_make_cost, 
-                  :node_key, :hardware
+                  :node_key, :hardware, :urls
     attr_reader   :designs, :design_images, :hardware, :assembly_instructions
     
     private :total_make_cost, :locked
@@ -201,7 +201,7 @@ module Ponoko
   end
   
   class Design < Base
-    attr_accessor :make_cost, :material_key, :design_file, :filename, :size, :quantity
+    attr_accessor :make_cost, :material_key, :design_file, :filename, :size, :quantity, :units, :bounding_box, :volume
     attr_accessor :content_type
     attr_reader   :material
 
