@@ -65,9 +65,9 @@ module Ponoko
   
   class Product < Base
     attr_accessor :name, :description, :materials_available, :node_key
-    attr_reader   :designs, :design_images, :assembly_instructions, :hardware
+    attr_reader   :designs, :design_images, :assembly_instructions, :hardware, :urls
     attr_writer   :locked, :total_make_cost
-    
+
     def send!
       fail Ponoko::PonokoAPIError, "Product must have a design." if @designs.empty?
       resp = Base::with_handle_error { Ponoko::api.post_product self.to_params }
@@ -195,9 +195,9 @@ module Ponoko
   end
   
   class Design < Base
-    attr_accessor :material_key, :design_file, :filename, :size, :quantity
+    attr_accessor :material_key, :design_file, :filename, :size, :quantity, :units
     attr_accessor :content_type
-    attr_reader   :material
+    attr_reader   :material, :bounding_box, :volume
     attr_writer   :make_cost
 
     def add_material material
