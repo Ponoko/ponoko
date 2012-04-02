@@ -17,8 +17,9 @@ class MiniTest::Unit::TestCase
     @api_responses = {
       :ponoko_404   => FakeHTTPResponse.new('404', "{\"error\":{\"message\":\"Not Found. Unknown key\",\"request\":{\"key\":\"bogus_key\"}}}"),
 
-      :nodes_200    => FakeHTTPResponse.new('200', "{\"nodes\": [{\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}]}"),
-      :node_200     => FakeHTTPResponse.new('200', "{\"node\": {\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
+      :nodes_200          => FakeHTTPResponse.new('200', "{\"nodes\": [{\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}]}"),
+      :node_200           => FakeHTTPResponse.new('200', "{\"node\": {\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
+      :node_unknown_field => FakeHTTPResponse.new('200', "{\"node\": {\"unknown_field\": \"Unknown field value\", \"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
 
       :mat_cat_200  => FakeHTTPResponse.new('200', "{\"key\":\"2413\",\"count\":347,\"materials\":[{\"updated_at\":\"2011/03/17 02:08:51 +0000\",\"type\":\"P1\",\"weight\":\"0.1 kg\",\"color\":\"Fuchsia\",\"key\":\"6812d5403269012e2f2f404062cdb04a\",\"thickness\":\"3.0 mm\",\"name\":\"Felt\",\"width\":\"181.0 mm\",\"material_type\":\"sheet\",\"length\":\"181.0 mm\",\"kind\":\"Fabric\"},
                                                                                                        {\"updated_at\":\"2011/03/17 02:08:51 +0000\",\"type\":\"P2\",\"weight\":\"0.3 kg\",\"color\":\"Fuchsia\",\"key\":\"68140dc03269012e2f31404062cdb04a\",\"thickness\":\"3.0 mm\",\"name\":\"Felt\",\"width\":\"384.0 mm\",\"material_type\":\"sheet\",\"length\":\"384.0 mm\",\"kind\":\"Fabric\"}]}"),

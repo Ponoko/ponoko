@@ -59,5 +59,5 @@ class TestAPINodes < MiniTest::Unit::TestCase
     assert_equal 2, materials['materials'].length
     assert_equal "Felt", materials['materials'].first['name']
   end
-    
+  
 end

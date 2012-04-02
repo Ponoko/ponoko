@@ -90,19 +90,16 @@ module Ponoko
       JSON.parse(resp.body)      
     end
     
-#   v2.connect 'products/:id/update_design/:design_id.:format',       {:controller => "products", :action => "update_design"}  # Rails 3 will save us
     def update_design product_key, params
       resp = @client.post "products/#{product_key.to_query}/update_design", params, :multipart
       JSON.parse(resp.body)      
     end
     
-#   v2.connect 'products/:product_id/replace_design/:id.:format',     {:controller => :products,  :action => :replace_design}        
     def replace_design product_key, params
       resp = @client.post "products/#{product_key.to_query}/replace_design", params, :multipart
       JSON.parse(resp.body)      
     end
     
-#   v2.connect 'products/:product_id/delete_design/:id.:format',      {:controller => :products,  :action => :delete_design}
     def destroy_design product_key, design_key
       resp = @client.post "products/#{product_key.to_query}/delete_design", design_key.to_query
       JSON.parse(resp.body)
@@ -127,7 +124,7 @@ module Ponoko
     end
     
     def post_assembly_instructions_file product_key, params
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions", params, :multipart
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params, :multipart
       JSON.parse(resp.body)      
     end
     
