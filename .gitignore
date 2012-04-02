@@ -4,5 +4,5 @@ Gemfile.lock
 pkg/*
 coverage
 .DS_Store
-
+.rvmrc
 *.bbprojectd/
