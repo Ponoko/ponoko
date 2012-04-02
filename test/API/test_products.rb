@@ -60,7 +60,6 @@ class TestAPIProducts < MiniTest::Unit::TestCase
 
     @test_auth.expect :post, @api_responses[:post_product_200], ["products", {:name => 'Product', :notes => 'This is a product description', :ref => 'product_ref', :designs => [{"file_name"=>"small.svg", :uploaded_data => file, :ref => '42', :material_key => '6bb50fd03269012e3526404062cdb04a'}]}, :multipart]
     
-    file = File.new(File.dirname(__FILE__) + "/../fixtures/small.svg")
     resp = @ponoko.post_product({:name => 'Product', :notes => 'This is a product description', :ref => 'product_ref',
                                 :designs => [{'file_name' => 'small.svg', :uploaded_data => file, :ref => '42', :material_key => '6bb50fd03269012e3526404062cdb04a'}]})
 
@@ -77,180 +76,123 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     
   end
   
-#   v2.connect 'products/:product_id/add_design',                     {:controller => :products,  :action => :add_design}
   def test_add_design
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/add_design", {}, :multipart]
-
     resp = @ponoko.post_design "2413", {}
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:id/update_design/:design_id.:format',       {:controller => "products", :action => "update_design"}  # Rails 3 will save us
   def test_update_design
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/update_design", {}, :multipart]
-
     resp = @ponoko.update_design "2413", {}
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/replace_design/:id.:format',     {:controller => :products,  :action => :replace_design}        
   def test_replace_design
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/replace_design", {}, :multipart]
-
     resp = @ponoko.replace_design "2413", {}
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/delete_design/:id.:format',      {:controller => :products,  :action => :delete_design}
   def test_destroy_design
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/delete_design", "666"]
-
     resp = @ponoko.destroy_design "2413", "666"
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/design_images',                  {:controller => :design_images,  :action => :new}
   def test_add_design_image
     image_file_default = File.new(File.dirname(__FILE__) + "/../fixtures/lamp-1_product_page.jpg")
     image_file = File.new(File.dirname(__FILE__) + "/../fixtures/3d-1_product_page.jpg")
 
-    @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_design_images', {:uploaded_data => image_file_default, :default => true}, :multipart]
-    @test_auth.expect :post, @api_responses[:post_product_200], ['products/add_design_images', {:uploaded_data => image_file}, :multipart]
+    @test_auth.expect :post, @api_responses[:post_product_200], ['products/2413/design_images/', {:uploaded_data => image_file_default, :default => true}, :multipart]
+    @test_auth.expect :post, @api_responses[:post_product_200], ['products/2413/design_images/', {:uploaded_data => image_file}, :multipart]
 
 
     resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file_default, :default => true}
     resp = @ponoko.post_design_image "2413", {:uploaded_data => image_file}
 
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/design_images/download',         {:controller => :design_images,  :action => :download}
   def test_get_design_image
     @test_auth.expect(:get, @api_responses[:image_200], ['products/2413/design_images/download','filename=lamp-1_product_page.jpg'])
-
     resp = @ponoko.get_design_image "2413", "lamp-1_product_page.jpg"
-
     @test_auth.verify
     assert_equal "The contents of an image file", resp
   end
   
-#   v2.connect 'products/:product_id/design_images/destroy',          {:controller => :design_images,  :action => :destroy}
   def test_destroy_design_image
     @test_auth.expect(:post, @api_responses[:product_200], ['products/2413/design_images/destroy','filename=lamp-1_product_page.jpg'])
-
     resp = @ponoko.destroy_design_image "2413", "lamp-1_product_page.jpg"
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/assembly_instructions',          {:controller => :assembly_instructions,  :action => :new}
   def test_add_assembly_instructions
     file = File.new(File.dirname(__FILE__) + "/../fixtures/instructions.txt")
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", {:uploaded_data => file}, :multipart]
-
     resp = @ponoko.post_assembly_instructions_file "2413", :uploaded_data => file
-
     @test_auth.verify
-    assert false
   end
   
   def test_add_assembly_instructions_instructables
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", "file_url=#{url}"]
-
     resp = @ponoko.post_assembly_instructions_url '2413', :file_url => url
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/assembly_instructions/download', {:controller => :assembly_instructions,  :action => :download}
   def test_get_assembly_instructions_file
     @test_auth.expect :get, @api_responses[:assembly_200], ['products/2413/assembly_instructions/download','filename=instructions.txt']
-
     resp = @ponoko.get_assembly_instructions "2413", "instructions.txt"
-
     @test_auth.verify
     assert_equal "The contents of a file", resp
   end
   
   def test_get_assembly_instructions_url
+    skip "Not implemented"
     assert false
   end
   
-#   v2.connect 'products/:product_id/assembly_instructions/destroy',  {:controller => :assembly_instructions,  :action => :destroy}
   def test_destroy_assembly_instructions_file
     @test_auth.expect :post, @api_responses[:product_200], ['products/2413/assembly_instructions/destroy','filename=instructions.txt']
-
     resp = @ponoko.destroy_assembly_instructions "2413", "instructions.txt"
-
     @test_auth.verify
-    assert false
   end
   
   def test_destroy_assembly_instructions_url
     @test_auth.expect :post, @api_responses[:product_200], ['products/2413/assembly_instructions/destroy','url=instructions.txt']
-
     resp = @ponoko.destroy_assembly_instructions_url "2413", "instructions.txt"
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/hardware',                       {:controller => :hardware,  :action => :new}
   def test_add_hardware
     @test_auth.expect :post, @api_responses[:hardware_200],  ['products/2413/hardware','sku=COM-00680&quantity=3']
     sku = 'COM-00680' # LED Light Bar - White
     quantity = 3
-
     resp = @ponoko.post_hardware "2413", {'sku' => sku, 'quantity' => quantity}
-
     @test_auth.verify
-    assert false
   end
 
-#   v2.connect 'products/:product_id/hardware/update',                {:controller => :hardware,  :action => :update}
   def test_update_hardware
     @test_auth.expect :post, @api_responses[:hardware_200],  ['products/2413/hardware/update','sku=COM-00680&quantity=99']
     sku = 'COM-00680' # LED Light Bar - White
     quantity = 99
-
     resp = @ponoko.update_hardware "2413", {'sku' => sku, 'quantity' => quantity}
-
     @test_auth.verify
-    assert false
   end
   
-#   v2.connect 'products/:product_id/hardware/destroy',               {:controller => :hardware,  :action => :destroy}
   def test_destroy_hardware
     @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware/destroy','sku=COM-00680']
     sku = 'COM-00680' # LED Light Bar - White
-
     resp = @ponoko.destroy_hardware "2413", 'sku' => sku
-
     @test_auth.verify
-    assert false
   end
   
   def test_escape_params
     @test_auth.expect(:get, @api_responses[:product_200], ['products/', 'fun%25ky[]%20key'])
-
     resp = @ponoko.get_products "fun%ky[] key"
-
     product = resp['product']
-
     @test_auth.verify
-    assert false
   end
   
   def test_server_exception

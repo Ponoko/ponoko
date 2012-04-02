@@ -37,9 +37,11 @@ class TestClient < MiniTest::Unit::TestCase
 
 
     resp = ponoko.get_products "fun/ky[] key"
-    p resp
+    assert resp
   end
+  
   def test_simple_auth
+    skip "Un-skip this test if you have edited the Simple Auth code"
     ponoko = Ponoko::BasicAPI.new env:             :production,
                                   app_key:         'not an app', 
                                   user_access_key: 'not a user'

@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "ponoko"
 
-  s.add_dependency "oauth"
+  s.add_dependency "oauth", "~> 0.4.4"  
   s.add_dependency "json"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "minitest", ">= 2.5.1"

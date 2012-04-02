@@ -153,4 +153,15 @@ class TestNodes < MiniTest::Unit::TestCase
     catalogue = node.material_catalogue! # nothing raised by bad expect
   end
     
+  def test_handle_unknown_field
+    @test_api.expect(:send, 
+                     make_resp(:node_unknown_field), 
+                     ['get_nodes', '2413'])
+
+    node = Ponoko::Node.get! "2413"
+
+    @test_api.verify
+    assert_equal "Ponoko - United States", node.name
+  end
+    
 end

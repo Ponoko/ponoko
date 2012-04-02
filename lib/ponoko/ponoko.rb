@@ -22,8 +22,9 @@ module Ponoko
     end
     
     def update params
-      params.each do |k,v|
-        send("#{k.gsub('?', '')}=", v)
+      params.each do |k, v|
+        m = "#{k.gsub('?', '')}=".to_sym
+        send(m, v) if self.respond_to? m
       end
     end
 
@@ -63,14 +64,12 @@ module Ponoko
   end
   
   class Product < Base
-    attr_accessor :name, :description, :materials_available, :locked, :total_make_cost, 
-                  :node_key, :hardware, :urls
-    attr_reader   :designs, :design_images, :hardware, :assembly_instructions
-    
-    private :total_make_cost, :locked
+    attr_accessor :name, :description, :materials_available, :node_key
+    attr_reader   :designs, :design_images, :assembly_instructions, :hardware
+    attr_writer   :locked, :total_make_cost
     
     def send!
-      raise Ponoko::PonokoAPIError, "Product must have a design." if designs.empty?
+      fail Ponoko::PonokoAPIError, "Product must have a design." if @designs.empty?
       resp = Base::with_handle_error { Ponoko::api.post_product self.to_params }
 
       update resp['product'] # FIXME fetch
@@ -106,16 +105,12 @@ module Ponoko
       end
     end
     
-    private :designs=
-    
     def hardware= hw
       @hardware.clear
       hw.each do |h|
         add_hardware Hardware.new(h), 1
       end
     end
-    
-    private :hardware=
     
     def add_designs *designs # quantity?
       designs.each do |d|
@@ -138,7 +133,6 @@ module Ponoko
     def add_design_image! file, default = false
 #       resp = Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default}
       resp = Base::with_handle_error { Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default} }
-      p resp
       update resp['product'] # FIXME fetch
     end
     
@@ -182,49 +176,48 @@ module Ponoko
     end
 
     def to_params
-      raise Ponoko::PonokoAPIError, "Product must have a Design." if designs.empty?
+      fail Ponoko::PonokoAPIError, "Product must have a Design." if @designs.empty?
       {'ref' => ref, 'name' => name, 'description' => description, 'designs' => @designs.to_params}
     end
     
     def making_cost
-      total_make_cost['making'].to_f
+      @total_make_cost['making'].to_f
     end
     
     def materials_cost
-      total_make_cost['materials'].to_f
+      @total_make_cost['materials'].to_f
     end
     
     def total_cost
-      total_make_cost['total'].to_f
+      @total_make_cost['total'].to_f
     end
     
   end
   
   class Design < Base
-    attr_accessor :make_cost, :material_key, :design_file, :filename, :size, :quantity, :units, :bounding_box, :volume
+    attr_accessor :material_key, :design_file, :filename, :size, :quantity
     attr_accessor :content_type
     attr_reader   :material
+    attr_writer   :make_cost
 
-    private :make_cost
-  
     def add_material material
        @material = material
     end
     
     def making_cost
-      make_cost['making'].to_f
+      @make_cost['making'].to_f
     end
     
     def material_cost
-      make_cost['material'].to_f
+      @make_cost['material'].to_f
     end
     
     def total_cost
-      make_cost['total'].to_f
+      @make_cost['total'].to_f
     end
     
     def to_params
-      raise Ponoko::PonokoAPIError, "Design must have a Material." if material.nil?
+      fail Ponoko::PonokoAPIError, "Design must have a Material." if material.nil?
       {'file_name' => File.basename(design_file), 'uploaded_data' => design_file, 'ref' => ref, 'material_key' => material.to_params}
     end   
   end
@@ -249,12 +242,10 @@ module Ponoko
   class Address < Hash; end
     
   class Order < Base
-    attr_accessor :shipped, :delivery_address, :events, :shipping_option_code
+    attr_accessor :delivery_address, :events, :shipping_option_code
     attr_accessor :last_successful_callback_at, :quantity, :tracking_numbers, :currency
-    attr_accessor :node_key, :cost
-    attr_accessor :products
-    
-    private :cost, :shipped
+    attr_accessor :node_key, :products
+    attr_writer   :cost, :shipped
     
     def initialize params = {}
       @events = []
@@ -265,8 +256,8 @@ module Ponoko
     end
     
     def send!
-      raise Ponoko::PonokoAPIError, "Order must have a Shipping Option Code" if shipping_option_code.nil?
-      raise Ponoko::PonokoAPIError, "Order must have Products" if products.empty?
+      fail Ponoko::PonokoAPIError, "Order must have a Shipping Option Code" if shipping_option_code.nil?
+      fail Ponoko::PonokoAPIError, "Order must have Products" if products.empty?
 
       resp = Ponoko::api.post_order self.to_params
       update resp['order'] # FIXME fetch
@@ -278,19 +269,19 @@ module Ponoko
     end
     
     def make_cost
-      cost['making'].to_f
+      @cost['making'].to_f
     end
     
     def material_cost
-      cost['materials'].to_f
+      @cost['materials'].to_f
     end
     
     def shipping_cost
-      cost['shipping'].to_f
+      @cost['shipping'].to_f
     end
     
     def total_cost
-      cost['total'].to_f
+      @cost['total'].to_f
     end
     
     def shipped?
@@ -314,8 +305,8 @@ module Ponoko
     end
     
     def to_params
-      raise Ponoko::PonokoAPIError, "Order must have a Delivery Address" if delivery_address.nil?
-      raise Ponoko::PonokoAPIError, "Order must have Products" if products.empty?
+      fail Ponoko::PonokoAPIError, "Order must have a Delivery Address" if delivery_address.nil?
+      fail Ponoko::PonokoAPIError, "Order must have Products" if products.empty?
       
       params = {}
       products = @products.collect do |p|
@@ -334,10 +325,6 @@ module Ponoko
   class Node < Base
     attr_accessor :name, :materials_updated_at, :count, :last_updated
     
-    def initialize params = {}
-      super
-    end
-    
     def materials= materials
       @material_catalogue = MaterialCatalogue.new
       materials.each do |m|
@@ -345,15 +332,13 @@ module Ponoko
       end
     end
     
-    private :materials=
-    
     def material_catalogue!
       materials_date = materials_updated_at
       update! # update self from server
 
       if @material_catalogue.nil? or materials_updated_at > materials_date
         resp = Ponoko::api.get_material_catalogue key
-        raise Ponoko::PonokoAPIError, "Unknown Error Occurred" unless key == resp['key']
+        fail Ponoko::PonokoAPIError, "Unknown Error Occurred" unless key == resp['key']
         update resp
       end
       
@@ -383,6 +368,9 @@ module Ponoko
     def [] key
       @catalogue[key]
     end
+    
+#     def (()) key
+#     end
     
     def count
       @materials.length
