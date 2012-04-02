@@ -61,9 +61,9 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   def test_shipping_options_fail
     @test_auth.expect(:get, 
                      @api_responses[:ponoko_404],
-                     ["orders/shipping_options?", "delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[state]=na&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"])
+                     ["orders/shipping_options?", "delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"])
 
-    resp = @ponoko.get_shipping_options({})
+    resp = @ponoko.get_shipping_options({'delivery_address' => {'address_line_1' => '27 Dixon Street', 'address_line_2' => 'Te Aro', 'city' => 'Wellington', 'zip_or_postal_code' => '6021', 'country' => 'New Zealand'}})
     assert_equal 'error', resp.keys.first
   end
   
