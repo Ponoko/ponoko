@@ -65,6 +65,13 @@ module Ponoko
       JSON.parse(resp.body)
     end
         
+    def request_log entries
+      raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
+
+      resp = @client.get "logs/requests", {'max' => entries}.to_query
+      JSON.parse(resp.body)
+    end
+        
     def post_order params
       resp = @client.post "orders/", params.to_query
       JSON.parse resp.body
