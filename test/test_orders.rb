@@ -86,7 +86,7 @@ class TestOrders < MiniTest::Unit::TestCase
       order.send!
     end
 
-    assert_equal "Order must have a Shipping Option Code", e.message
+    assert_equal "Order must have a Delivery Address", e.message
   end
   
   def test_make_an_order_with_no_products
