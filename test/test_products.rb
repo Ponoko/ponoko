@@ -52,9 +52,34 @@ class TestProducts < MiniTest::Unit::TestCase
       product.send!
     end
 
-    assert_equal "Product must have a design.", e.message
+    assert_equal "Product must have a Design.", e.message
   end
+  
+  def test_product_with_bad_design
+    file = File.new(File.dirname(__FILE__) + "/fixtures/small.svg")
+    @test_api.expect :post_product,
+                      make_resp(:bad_design_400), 
+                      [{"ref" => "product_ref", "name"=>"Product", "description"=>"This is a product description", "designs"=>[{"file_name" => "small.svg", "uploaded_data" => file, "ref"=>"42", "material_key"=>"6bb50fd03269012e3526404062cdb04a"}]}]
 
+    product = Ponoko::Product.new 'ref' => 'product_ref', 'name' => 'Product', 'description' => 'This is a product description'
+  
+    material = Ponoko::Material.new 'key' => '6bb50fd03269012e3526404062cdb04a'
+    design = Ponoko::Design.new 'ref' => '42', 'design_file' => file
+    design.add_material material
+
+    product.add_designs design
+
+    product = product.send!
+
+    @test_api.verify
+    assert product.error
+    assert_equal "Bad Request. Error processing design file(s).", product.error.message
+    assert product.error.errors
+    assert_equal "small.svg", product.error.errors.first.name
+    assert_equal "incorrect_red", product.error.errors.first.error_code
+    
+  end
+  
   def test_make_a_product
     file = File.new(File.dirname(__FILE__) + "/fixtures/small.svg")
     @test_api.expect :post_product, 
@@ -82,79 +107,130 @@ class TestProducts < MiniTest::Unit::TestCase
 
   end
   
-  def test_add_image
+  def test_add_design
+      product = Ponoko::Product.new 'ref' => 'product_ref'
+      assert_equal 0, product.designs.length
+      
+      product.add_designs Ponoko::Design.new('ref' => '42'), Ponoko::Design.new('ref' => '43')
+
+      assert_equal 2, product.designs.length
+  end
+  
+  def test_add_design_bang
+    product = Ponoko::Product.new 'ref' => 'product_ref'
+    assert_equal 0, product.designs.length
+
+    product.add_design! Ponoko::Design.new('ref' => '42')
+
+    assert_equal 1, product.designs.length
+  end
+  
+  def test_add_design_bang_to_sent_product
+    product = Ponoko::Product.new 'key' => "product_key"
+
+    assert_equal 0, product.designs.length
+
+    file = File.new(File.dirname(__FILE__) + "/fixtures/small.svg")
+
+    @test_api.expect :post_design, 
+                      make_resp(:post_product_200), 
+                      ["product_key", {"file_name"=>"small.svg", "uploaded_data"=>file, "ref"=>"42", "material_key"=>"6bb50fd03269012e3526404062cdb04a"}]
+                      
+    material = Ponoko::Material.new 'key' => '6bb50fd03269012e3526404062cdb04a'
+    design = Ponoko::Design.new 'ref' => '42', 'design_file' => file
+    design.add_material material
+                          
+    product.add_design! design
+
+    @test_api.verify
+    assert_equal 1, product.designs.length
+  end
+  
+  def test_add_image_bang
     product = Ponoko::Product.new 'key' => "product_key"
     image_file = File.new(File.dirname(__FILE__) + "/fixtures/3d-1_product_page.jpg")
     @test_api.expect :post_design_image, 
                       make_resp(:post_product_200), 
-                      [String, {"uploaded_data" => image_file, 'default' => false}]
+                      ["product_key", {"uploaded_data" => image_file, 'default' => false}]
                       
     
     product.add_design_image! image_file
 
     @test_api.verify
+    assert_equal 1, product.design_images.length
+    assert_equal false, product.design_images.first.default
+    assert_equal "3d-1_product_page.jpg", product.design_images.first.filename
   end
   
-  def test_add_default_image
+  def test_add_default_image_bang
     product = Ponoko::Product.new 'key' => "product_key"
     image_file_default = File.new(File.dirname(__FILE__) + "/fixtures/lamp-1_product_page.jpg")
     @test_api.expect :post_design_image, 
                       make_resp(:post_product_200), 
-                      [String, {"uploaded_data" => image_file_default, 'default' => true}]
+                      ["product_key", {"uploaded_data" => image_file_default, 'default' => true}]
     
     product.add_design_image! image_file_default, true
 
     @test_api.verify
+    assert_equal true, product.design_images.first.default
   end
   
   def test_get_design_image
     @test_api.expect :get_design_image, 
-                      @api_responses[:image_200],
-                      [String, {"filename" => "3d-1_product_page.jpg"}]
+                      @api_responses[:image_200].body,
+                      ["product_key", {"filename" => "3d-1_product_page.jpg"}]
 
     product = Ponoko::Product.new 'key' => "product_key"
-    product.get_design_image_file! '3d-1_product_page.jpg'
+    resp = product.get_design_image_file! '3d-1_product_page.jpg'
+
     @test_api.verify
+    p resp
+    assert_equal "The contents of an image file", resp
   end
   
-  def test_add_assembly_instructions
+  def test_add_assembly_instructions_bang
     product = Ponoko::Product.new 'key' => "product_key"
     file = File.new(File.dirname(__FILE__) + "/fixtures/instructions.txt")
-    @test_api.expect :post_assembly_instructions, 
+    @test_api.expect :post_assembly_instructions_file, 
                       make_resp(:post_product_200), 
-                      [String, {"uploaded_data" => file}]
+                      ["product_key", {"uploaded_data" => file}]
     
-    product.add_assembly_instructions file
+    product.add_assembly_instructions! file
 
     @test_api.verify
+    assert_equal 1, product.assembly_instructions.length
+    assert_equal instructions.txt, product.assembly_instructions.first.filename
   end
   
   def test_add_assembly_instructions_instructables
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
-    @test_api.expect :post_assembly_instructions, 
+    @test_api.expect :post_assembly_instructions_url, 
                       make_resp(:post_product_200), 
-                      [String, {"file_url" => url}]
+                      ["product_key", {"file_url" => url}]
 
     product = Ponoko::Product.new 'key' => "product_key"
-    product.add_assembly_instructions url
+    product.add_assembly_instructions! url
 
     @test_api.verify
+    assert_equal "http://www.instructables.com/id/3D-print-your-minecraft-avatar/", product.assembly_instructions.first.url
   end
   
   def test_get_assembly_instructions
     @test_api.expect :get_assembly_instructions, 
-                      @api_responses[:assembly_200], 
-                      [String, {"filename" => "instructions.txt"}]
+                      @api_responses[:assembly_200].body, 
+                      ["product_key", {"filename" => "instructions.txt"}]
 
     product = Ponoko::Product.new 'key' => "product_key"
-    product.get_assembly_instructions_file! "instructions.txt"
+    resp = product.get_assembly_instructions_file! "instructions.txt"
+
     @test_api.verify
+    assert_equal "The contents of a file", resp
   end
   
-  def test_add_hardware
+  def test_add_hardware_bang
     @test_api.expect :post_hardware, 
                       make_resp(:hardware_200), 
-                      [String, {"sku" => "COM-00680", "quantity" => 3}]
+                      ["product_key", {"sku" => "COM-00680", "quantity" => 3}]
 
     product = Ponoko::Product.new 'key' => "product_key"
     sku = 'COM-00680' # LED Light Bar - White
@@ -168,6 +244,17 @@ class TestProducts < MiniTest::Unit::TestCase
     assert_equal 1, product.hardware.length
     assert_equal 'LED Light Bar - White', product.hardware.first.name
     assert_equal 3, product.hardware.first.quantity
+  end
+  
+  def test_delete_product
+    @test_api.expect :delete_product, 
+                      {"deleted"=>true, "product_key"=>"product_key"}, 
+                      ['product_key']
+
+    product = Ponoko::Product.new 'key' => "product_key"
+                      
+    assert_nil product.delete!
+
   end
   
   def test_server_exception
