@@ -26,11 +26,7 @@ module Ponoko
     end
     
     def make_request
-      resp = yield
-      
-      fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'" if resp.code.to_i > 499
-
-      resp
+      yield.tap {|resp| fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'" if resp.code.to_i > 499 }
     end
     
     def get_nodes node_key = nil
@@ -62,6 +58,13 @@ module Ponoko
       raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
 
       resp = @client.get "orders/trigger-next-event/", key.to_query
+      JSON.parse(resp.body)
+    end
+        
+    def request_log entries
+      raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
+
+      resp = @client.get "logs/requests/", {'max' => entries}.to_query
       JSON.parse(resp.body)
     end
         
@@ -133,8 +136,8 @@ module Ponoko
       JSON.parse(resp.body)      
     end
     
-    def get_assembly_instructions key, filename
-      resp = @client.get "products/#{key.to_query}/assembly_instructions/download", filename.to_query("filename")
+    def get_assembly_instructions product_key, filename
+      resp = @client.get "products/#{product_key.to_query}/assembly_instructions/download", filename.to_query("filename")
       resp.body
     end
     

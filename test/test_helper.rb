@@ -22,7 +22,7 @@ class MiniTest::Unit::TestCase
       :node_unknown_field => FakeHTTPResponse.new('200', "{\"node\": {\"unknown_field\": \"Unknown field value\", \"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
 
       :mat_cat_200  => FakeHTTPResponse.new('200', "{\"key\":\"2413\",\"count\":347,\"materials\":[{\"updated_at\":\"2011/03/17 02:08:51 +0000\",\"type\":\"P1\",\"weight\":\"0.1 kg\",\"color\":\"Fuchsia\",\"key\":\"6812d5403269012e2f2f404062cdb04a\",\"thickness\":\"3.0 mm\",\"name\":\"Felt\",\"width\":\"181.0 mm\",\"material_type\":\"sheet\",\"length\":\"181.0 mm\",\"kind\":\"Fabric\"},
-                                                                                                       {\"updated_at\":\"2011/03/17 02:08:51 +0000\",\"type\":\"P2\",\"weight\":\"0.3 kg\",\"color\":\"Fuchsia\",\"key\":\"68140dc03269012e2f31404062cdb04a\",\"thickness\":\"3.0 mm\",\"name\":\"Felt\",\"width\":\"384.0 mm\",\"material_type\":\"sheet\",\"length\":\"384.0 mm\",\"kind\":\"Fabric\"}]}"),
+                                                                                                   {\"updated_at\":\"2011/03/17 02:08:51 +0000\",\"type\":\"P2\",\"weight\":\"0.3 kg\",\"color\":\"Fuchsia\",\"key\":\"68140dc03269012e2f31404062cdb04a\",\"thickness\":\"3.0 mm\",\"name\":\"Felt\",\"width\":\"384.0 mm\",\"material_type\":\"sheet\",\"length\":\"384.0 mm\",\"kind\":\"Fabric\"}]}"),
 
       :products_200 => FakeHTTPResponse.new('200', "{\"products\":[{\"name\":\"xxx\",\"created_at\":\"2011/07/19 09:14:45 +0000\",\"updated_at\":\"2011/07/19 09:14:47 +0000\",\"ref\":null,\"key\":\"8bf834a59b8f36091d86faa27c2dd4bb\"},{\"name\":\"xxx\",\"created_at\":\"2011/07/19 09:13:51 +0000\",\"updated_at\":\"2011/07/19 09:13:53 +0000\",\"ref\":null,\"key\":\"b1129260f306179486935bd63f26a7a3\"}]}"),
       :product_200  => FakeHTTPResponse.new('200', "{\"product\":{\"name\":\"xxx\",
@@ -57,6 +57,12 @@ class MiniTest::Unit::TestCase
                                                                                                \"currency\":\"USD\"}}]}}"),
 
       :product_missing_design_400 => FakeHTTPResponse.new('400', "{\"error\":{\"message\":\"Bad Request. Product must have a design.\",\"request\":{\"key\":null}}}"),
+      :bad_design_400             => FakeHTTPResponse.new('400', "{\"error\":{\"errors\":[{\"error_code\":\"incorrect_red\",
+                                                                                           \"type\":\"design_processing\",
+                                                                                           \"name\":\"small.svg\"}],
+                                                                                           \"message\":\"Bad Request. Error processing design file(s).\"},
+                                                                               \"message\":\"Bad Request. Error processing design file(s).\"}"),
+
       :post_product_200 => FakeHTTPResponse.new('200', "{\"product\":{\"name\":\"Product\",
                                                                       \"created_at\":\"2011/07/19 09:14:45 +0000\",
                                                                       \"updated_at\":\"2011/07/19 09:14:47 +0000\",
@@ -132,6 +138,7 @@ class MiniTest::Unit::TestCase
                                                                                                \"making\":\"16.02\",
                                                                                                \"materials\":\"2.84\",
                                                                                                \"currency\":\"USD\"}}]}}"),
+
       :ponoko_exception   => FakeHTTPResponse.new('500', "<html>Exceptions return HTML</html>")
     }
   end

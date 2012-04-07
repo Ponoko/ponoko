@@ -35,6 +35,15 @@ class TestNodes < MiniTest::Unit::TestCase
     assert_equal "Ponoko - United States", node.name
   end
   
+  def test_get_node_404
+    @test_api.expect(:send, make_resp(:ponoko_404), ['get_nodes', 'bogus_key'])
+
+    node = Ponoko::Node.get! "bogus_key"
+
+    assert_equal 'error', resp.keys.first
+    @test_auth.verify
+  end
+  
   def test_get_material_catalogue
     @test_api.expect(:send, 
                      make_resp(:node_200), 
@@ -152,13 +161,24 @@ class TestNodes < MiniTest::Unit::TestCase
                      
     catalogue = node.material_catalogue! # nothing raised by bad expect
   end
+  
+  def test_get_material_cataloge_fail
+    @test_api.expect(:send, make_resp(:ponoko_404), ["get_material_catalogue", "bogus_key"])
+
+    resp = @ponoko.get_material_catalogue 'bogus_key'
     
+    assert_equal 'error', resp.keys.first
+    @test_auth.verify
+  end
+
   def test_handle_unknown_field
     @test_api.expect(:send, 
                      make_resp(:node_unknown_field), 
                      ['get_nodes', '2413'])
 
-    node = Ponoko::Node.get! "2413"
+    node = Ponoko::Node.new "key" => "2413"
+
+    catalogue = node.material_catalogue
 
     @test_api.verify
     assert_equal "Ponoko - United States", node.name
