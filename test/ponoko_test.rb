@@ -33,7 +33,7 @@ node = Ponoko::Node.get! nodes.last.key
 pp node
 
 mc = node.material_catalogue
-pp mc
+# pp mc
 
 
 hr "Products"
@@ -60,7 +60,15 @@ hr "Create Product"
 new_product.send!
 pp new_product
 
-# exit
+# new_product.add_design_image! File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
+new_product.add_assembly_instructions! 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
+new_product.add_hardware! 'COM-00680', 2
+
+pp new_product
+
+new_product.delete
+
+exit
 
 hr "Orders"
 orders = Ponoko::Order.get!
