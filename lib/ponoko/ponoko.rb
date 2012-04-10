@@ -208,6 +208,10 @@ module Ponoko
       @total_make_cost['total'].to_f
     end
     
+    def currency
+      @total_make_cost['currency']
+    end
+
   end
   
   class Design < Base
@@ -233,6 +237,10 @@ module Ponoko
       @make_cost['total'].to_f
     end
     
+    def currency
+      @make_cost['currency']
+    end
+
     def to_params
       fail Ponoko::PonokoAPIError, "Design must have a Design File." if design_file.nil?
       fail Ponoko::PonokoAPIError, "Design must have a Material." if material.nil?
@@ -303,6 +311,10 @@ module Ponoko
     
     def total_cost
       @cost['total'].to_f
+    end
+    
+    def currency
+      @cost['currency']
     end
     
     def shipped?

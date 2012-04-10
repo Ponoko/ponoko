@@ -42,6 +42,7 @@ class TestProducts < MiniTest::Unit::TestCase
     assert_equal "bottom_new.stl", design.filename
     assert_equal 18.86, design.total_cost
     assert_equal 0, design.material_cost
+    assert_equal 'USD', design.currency
   end
 
   def test_make_a_product_missing_design
@@ -102,6 +103,7 @@ class TestProducts < MiniTest::Unit::TestCase
     assert_equal "8bf834a59b8f36091d86faa27c2dd4bb", product.key
     assert_equal false, product.locked?
     assert_equal 18.86, product.total_cost
+    assert_equal 'USD', product.currency
     assert_equal 1, product.designs.length
     assert_equal 16.02, product.designs.first.making_cost
 
