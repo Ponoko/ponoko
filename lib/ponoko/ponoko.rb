@@ -43,8 +43,10 @@ module Ponoko
 
     def self.get! key = nil
       resp = with_handle_error { Ponoko::api.send "get_#{ponoko_objects}", key }
-
-      if key.nil?
+      
+      if resp['error']
+        Error.new(resp['error'])
+      elsif key.nil?
         resp[ponoko_objects].collect do |p| # FIXME fetch
           new(p)
         end
@@ -58,14 +60,14 @@ module Ponoko
     end
     
     def self.with_handle_error
-      resp = yield.tap {|resp| throw :error, Error.new(resp['error']) if resp['error'] }
+      resp = yield#.tap {|resp| throw :error, Error.new(resp['error']) if resp['error'] }
 
     rescue JSON::ParserError
       fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'"  # FIXME resp will always be nil
     end
     
     def with_handle_error
-#       @error = nil;
+      @error = nil;
       resp = yield
       
       if resp.is_a? Hash
@@ -134,7 +136,21 @@ module Ponoko
       end
     end
     
-    def add_designs *designs # quantity?
+    def assembly_instructions= ass
+      @assembly_instructions.clear
+      ass.each do |a|
+        @assembly_instructions << AssemblyInstruction.new(a)
+      end
+    end
+
+    def design_images= di
+      @design_images.clear
+      di.each do |d|
+        @design_images << DesignImage.new(d)
+      end
+    end
+        
+    def add_designs *designs
       designs.each do |d|
         @designs << d
       end
@@ -259,6 +275,14 @@ module Ponoko
     end
   end
   
+  class DesignImage < Base
+    attr_accessor :filename, :default
+  end
+  
+  class AssemblyInstruction < Base
+    attr_accessor :file_url, :filename
+  end
+
   class Address < Hash; end
     
   class Order < Base
@@ -350,15 +374,17 @@ module Ponoko
     
     def material_catalogue!
       materials_date = materials_updated_at
-      update! # update self from server
+      # update self from server to get material catalogue update time.
+      update! # FIXME test for error
 
       if @material_catalogue.nil? or materials_updated_at > materials_date
-        resp = Ponoko::api.get_material_catalogue key
-        fail Ponoko::PonokoAPIError, "Unknown Error Occurred" unless key == resp['key']
-        update resp
+        resp = with_handle_error { Ponoko::api.get_material_catalogue key }
+        if resp.is_a?(Hash) && key == resp['key']
+          update resp
+        end
       end
       
-      material_catalogue
+      @material_catalogue
     end
 
     def material_catalogue

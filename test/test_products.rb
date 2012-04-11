@@ -43,7 +43,7 @@ class TestProducts < MiniTest::Unit::TestCase
     assert_equal 18.86, design.total_cost
     assert_equal 0, design.material_cost
   end
-
+  
   def test_make_a_product_missing_design
     product = Ponoko::Product.new
     assert product
@@ -149,8 +149,11 @@ class TestProducts < MiniTest::Unit::TestCase
   def test_add_image_bang
     product = Ponoko::Product.new 'key' => "product_key"
     image_file = File.new(File.dirname(__FILE__) + "/fixtures/3d-1_product_page.jpg")
+    
+    test_resp = make_resp(:post_product_200)
+    test_resp['product'].merge!({'design_images' => [{'filename' => '3d-1_product_page.jpg', 'default' => false}]})
     @test_api.expect :post_design_image, 
-                      make_resp(:post_product_200), 
+                      test_resp,
                       ["product_key", {"uploaded_data" => image_file, 'default' => false}]
                       
     
@@ -165,8 +168,10 @@ class TestProducts < MiniTest::Unit::TestCase
   def test_add_default_image_bang
     product = Ponoko::Product.new 'key' => "product_key"
     image_file_default = File.new(File.dirname(__FILE__) + "/fixtures/lamp-1_product_page.jpg")
+    test_resp = make_resp(:post_product_200)
+    test_resp['product'].merge!({'design_images' => [{'filename' => '3d-1_product_page.jpg', 'default' => true}]})
     @test_api.expect :post_design_image, 
-                      make_resp(:post_product_200), 
+                      test_resp,
                       ["product_key", {"uploaded_data" => image_file_default, 'default' => true}]
     
     product.add_design_image! image_file_default, true
@@ -184,35 +189,43 @@ class TestProducts < MiniTest::Unit::TestCase
     resp = product.get_design_image_file! '3d-1_product_page.jpg'
 
     @test_api.verify
-    p resp
     assert_equal "The contents of an image file", resp
   end
   
   def test_add_assembly_instructions_bang
     product = Ponoko::Product.new 'key' => "product_key"
     file = File.new(File.dirname(__FILE__) + "/fixtures/instructions.txt")
+
+    test_resp = make_resp(:post_product_200)
+    test_resp['product'].merge!({'assembly_instructions'=>[{'filename' => 'instructions.txt'}]})
+    
     @test_api.expect :post_assembly_instructions_file, 
-                      make_resp(:post_product_200), 
+                      test_resp,
                       ["product_key", {"uploaded_data" => file}]
     
     product.add_assembly_instructions! file
 
     @test_api.verify
     assert_equal 1, product.assembly_instructions.length
-    assert_equal instructions.txt, product.assembly_instructions.first.filename
+    assert_equal 'instructions.txt', product.assembly_instructions.first.filename
   end
   
   def test_add_assembly_instructions_instructables
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
+    product = Ponoko::Product.new 'key' => "product_key"
+
+    test_resp = make_resp(:post_product_200)
+    test_resp['product'].merge!({'assembly_instructions'=>[{'file_url' => url}]})
+    
     @test_api.expect :post_assembly_instructions_url, 
-                      make_resp(:post_product_200), 
+                      test_resp,
                       ["product_key", {"file_url" => url}]
 
-    product = Ponoko::Product.new 'key' => "product_key"
     product.add_assembly_instructions! url
 
     @test_api.verify
-    assert_equal "http://www.instructables.com/id/3D-print-your-minecraft-avatar/", product.assembly_instructions.first.url
+    assert_equal 1, product.assembly_instructions.length
+    assert_equal "http://www.instructables.com/id/3D-print-your-minecraft-avatar/", product.assembly_instructions.first.file_url
   end
   
   def test_get_assembly_instructions
@@ -266,6 +279,28 @@ class TestProducts < MiniTest::Unit::TestCase
     end    
 
     @test_auth.verify
+  end
+  
+  def test_clear_old_errors
+    @test_api.expect :get_assembly_instructions, 
+                      make_resp(:ponoko_404), 
+                      ["product_key", {"filename" => "bad-file-name.txt"}]
+
+    product = Ponoko::Product.new 'key' => "product_key"
+    assert_nil product.error
+    
+    product.get_assembly_instructions_file! "bad-file-name.txt"
+
+    @test_api.verify
+    assert_equal "Not Found. Unknown key", product.error.message
+  
+    @test_api.expect :get_assembly_instructions, 
+                      @api_responses[:assembly_200].body, 
+                      ["product_key", {"filename" => "good-file-name.txt"}]
+
+    product.get_assembly_instructions_file! "good-file-name.txt"
+    assert_equal nil, product.error
+  
   end
 end
 

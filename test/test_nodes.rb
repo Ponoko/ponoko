@@ -38,10 +38,11 @@ class TestNodes < MiniTest::Unit::TestCase
   def test_get_node_404
     @test_api.expect(:send, make_resp(:ponoko_404), ['get_nodes', 'bogus_key'])
 
-    node = Ponoko::Node.get! "bogus_key"
+    resp = Ponoko::Node.get! "bogus_key"
 
-    assert_equal 'error', resp.keys.first
-    @test_auth.verify
+    @test_api.verify
+    assert_equal Ponoko::Error, resp.class
+    assert_equal 'Not Found. Unknown key', resp.message
   end
   
   def test_get_material_catalogue
@@ -163,22 +164,24 @@ class TestNodes < MiniTest::Unit::TestCase
   end
   
   def test_get_material_cataloge_fail
-    @test_api.expect(:send, make_resp(:ponoko_404), ["get_material_catalogue", "bogus_key"])
+    # Deliberately make a bad node and try to get material catalogue
+    @test_api.expect(:send, make_resp(:ponoko_404), ["get_nodes", "bogus_key"])
+    @test_api.expect(:get_material_catalogue, make_resp(:ponoko_404), ["bogus_key"])
 
-    resp = @ponoko.get_material_catalogue 'bogus_key'
-    
-    assert_equal 'error', resp.keys.first
-    @test_auth.verify
+    node = Ponoko::Node.new "key" => "bogus_key"
+
+    node.material_catalogue
+        
+    assert_equal "Not Found. Unknown key", node.error.message
+    @test_api.verify
   end
 
-  def test_handle_unknown_field
+  def test_handle_unknown_field_in_class_method
     @test_api.expect(:send, 
                      make_resp(:node_unknown_field), 
                      ['get_nodes', '2413'])
 
-    node = Ponoko::Node.new "key" => "2413"
-
-    catalogue = node.material_catalogue
+    node = Ponoko::Node.get!"2413"
 
     @test_api.verify
     assert_equal "Ponoko - United States", node.name
