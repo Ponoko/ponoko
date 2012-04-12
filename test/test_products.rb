@@ -192,7 +192,7 @@ class TestProducts < MiniTest::Unit::TestCase
     assert_equal "The contents of an image file", resp
   end
   
-  def test_add_assembly_instructions_bang
+  def test_add_assembly_instructions_file
     product = Ponoko::Product.new 'key' => "product_key"
     file = File.new(File.dirname(__FILE__) + "/fixtures/instructions.txt")
 
@@ -210,7 +210,7 @@ class TestProducts < MiniTest::Unit::TestCase
     assert_equal 'instructions.txt', product.assembly_instructions.first.filename
   end
   
-  def test_add_assembly_instructions_instructables
+  def test_add_assembly_instructions_url
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
     product = Ponoko::Product.new 'key' => "product_key"
 
