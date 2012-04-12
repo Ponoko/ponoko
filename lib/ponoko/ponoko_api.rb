@@ -69,7 +69,7 @@ module Ponoko
     end
         
     def post_order params
-      resp = @client.post "orders/", params#.to_query
+      resp = @client.post "orders/", params
       JSON.parse resp.body
     end
 
@@ -84,7 +84,7 @@ module Ponoko
     end
     
     def delete_product product_key
-      resp = @client.get "products/delete/#{product_key.to_query}"
+      resp = @client.post "products/delete/#{product_key.to_query}"
       JSON.parse(resp.body)
     end
 
@@ -104,7 +104,7 @@ module Ponoko
     end
     
     def destroy_design product_key, design_key
-      resp = @client.post "products/#{product_key.to_query}/delete_design", design_key#.to_query
+      resp = @client.post "products/#{product_key.to_query}/delete_design", design_key
       JSON.parse(resp.body)
     end
     
@@ -119,7 +119,6 @@ module Ponoko
     end
     
     def destroy_design_image product_key, filename
-#       resp = @client.post "products/#{product_key.to_query}/design_images/destroy", filename.to_query("filename")
       resp = @client.post "products/#{product_key.to_query}/design_images/destroy", {"filename" => filename}
       resp.body
     end
@@ -130,7 +129,7 @@ module Ponoko
     end
     
     def post_assembly_instructions_url product_key, params
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params#.to_query
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params
       JSON.parse(resp.body)      
     end
     
@@ -140,29 +139,27 @@ module Ponoko
     end
     
     def destroy_assembly_instructions product_key, filename
-#       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", filename.to_query("filename")
       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"filename" => filename}
       JSON.parse(resp.body)      
     end
     
     def destroy_assembly_instructions_url product_key, url
-#       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", url.to_query("url")
       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"url" => url}
       JSON.parse(resp.body)      
     end
     
     def post_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params#.to_query
+      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params
       JSON.parse(resp.body)      
     end
     
     def update_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware/update", hardware_params#.to_query
+      resp = @client.post "products/#{product_key.to_query}/hardware/update", hardware_params
       JSON.parse(resp.body)      
     end
     
-    def destroy_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware/destroy", hardware_params#.to_query
+    def destroy_hardware product_key, hardware_key
+      resp = @client.post "products/#{product_key.to_query}/hardware/destroy", hardware_key
       JSON.parse(resp.body)      
     end
   end
