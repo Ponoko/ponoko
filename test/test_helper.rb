@@ -16,7 +16,7 @@ class MiniTest::Unit::TestCase
   def load_test_resp
     @api_responses = {
       :ponoko_404   => FakeHTTPResponse.new('404', "{\"error\":{\"message\":\"Not Found. Unknown key\",\"request\":{\"key\":\"bogus_key\"}}}"),
-
+      :ponoko_500   => FakeHTTPResponse.new('500', "{\"error\":{\"request\":{\"product_id\":\"f10ef21ddf0a890eca1a28e36978dd49\",\"uploaded_data\":\"\\u003Cdata\\u003E\",\"default\":\"0\"},\"message\":\"Error. Internal Server Error\"}}"),
       :nodes_200          => FakeHTTPResponse.new('200', "{\"nodes\": [{\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}]}"),
       :node_200           => FakeHTTPResponse.new('200', "{\"node\": {\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
       :node_unknown_field => FakeHTTPResponse.new('200', "{\"node\": {\"unknown_field\": \"Unknown field value\", \"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
