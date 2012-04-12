@@ -333,12 +333,19 @@ module Ponoko
     
     def status!
       with_handle_error { Ponoko::api.get_order_status key }
-      status
+      if @error.nil?
+        @events.last['name'] # FIXME fetch
+      else
+        @error
+      end
     end
     
     def status
-      status! if @events.empty?
-      @events.last['name'] # FIXME fetch
+      if @events.empty?
+        status!
+      else
+        @events.last['name'] # FIXME fetch
+      end
     end
     
     def shipping_options!

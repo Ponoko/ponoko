@@ -149,8 +149,8 @@ class TestOrders < MiniTest::Unit::TestCase
     assert_equal 56.78, order.material_cost
     assert_equal 56.78, order.shipping_cost
     assert_equal 56.78, order.total_cost
-#    assert_equal 1, order.quantity
-#    assert_equal 'USD', order.currency
+#     assert_equal 1, order.quantity
+#     assert_equal 'USD', order.currency
   end
   
   def test_update_order
@@ -177,16 +177,40 @@ class TestOrders < MiniTest::Unit::TestCase
     @test_api.expect :get_order_status, make_resp(:status), ['order_key']
 
     order = Ponoko::Order.new 'key' => 'order_key'    
-    order.status!
+    status = order.status
 
     @test_api.verify
+    assert_equal 'design_checked', status
     refute order.shipped?
     assert_equal 'order_key', order.key
+    assert_equal 'design_checked', status
     assert_equal 'design_checked', order.status
     assert_equal [{'name' => 'design_checked', 'completed_at' => '2011/01/01 12:00:00 +0000'}], order.events
     assert_equal ['xxx-yyy'], order.tracking_numbers
     assert_equal 'ups_ground', order.shipping_option_code
     assert_equal '2011/01/01 12:00:00 +0000', order.last_successful_callback_at
+  end
+
+  def test_order_status_bang
+    @test_api.expect :get_order_status, make_resp(:status), ['order_key']
+
+    order = Ponoko::Order.new 'key' => 'order_key'    
+    status = order.status!
+
+    @test_api.verify
+    assert_equal 'design_checked', status
+    assert_equal [{'name' => 'design_checked', 'completed_at' => '2011/01/01 12:00:00 +0000'}], order.events
+  end
+
+  def test_order_status_error
+    @test_api.expect :get_order_status, make_resp(:ponoko_404), ['bogus_key']
+
+    order = Ponoko::Order.new 'key' => 'bogus_key'    
+    status = order.status
+
+    @test_api.verify
+    assert_equal 'Not Found. Unknown key', status.message
+
   end
 
 end
