@@ -17,7 +17,6 @@ Ponoko.api = Ponoko::OAuthAPI.new env:             :sandbox,
                                   access_token:    'Obq8aJ4O7Y8XCfkB1eFUjRMtRILPIfXiA80WvGnd', 
                                   access_secret:   'hNUeBfLcoz5K72TPRO3nW3Ovw7fcjzqyp84NzT7X'
 
-
 # Ponoko.api = Ponoko::OAuthAPI.new env:             :test,
 #                                   consumer_key:    'mgaFFoAzbnc7I4pOitGWf9ATECzDElfZB072ugmR', 
 #                                   consumer_secret: 'yivct1T8KciWG2astV5ljPsYTjkEGwNIckOUOikS',
@@ -60,15 +59,20 @@ hr "Create Product"
 new_product.send!
 pp new_product
 
-# new_product.add_design_image! File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
+hr "Design Image"
+new_product.add_design_image! File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
+
+hr "Assembly Instructions"
 new_product.add_assembly_instructions! 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
+
+hr "Hardware"
 new_product.add_hardware! 'COM-00680', 2
 
 pp new_product
 
-new_product.delete
+new_product.delete!
 
-exit
+# exit
 
 hr "Orders"
 orders = Ponoko::Order.get!
