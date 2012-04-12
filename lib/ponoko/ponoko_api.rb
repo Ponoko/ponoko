@@ -30,51 +30,51 @@ module Ponoko
     end
     
     def get_nodes node_key = nil
-      resp = @client.get "nodes/", node_key.to_query
+      resp = @client.get "nodes/#{node_key.to_query}"
       JSON.parse(resp.body)
     end
     
     def get_material_catalogue node_key
-      resp = @client.get "nodes/material-catalog/", node_key.to_query
+      resp = @client.get "nodes/material-catalog/#{node_key.to_query}"
       JSON.parse(resp.body)
     end
     
     def get_orders key = nil
-      resp = @client.get "orders/", key.to_query
+      resp = @client.get "orders/#{key.to_query}"
       JSON.parse(resp.body)
     end
     
     def get_shipping_options params
-      resp = @client.get "orders/shipping_options?", params.to_query
+      resp = @client.get "orders/shipping_options?#{params.to_query}"
       JSON.parse(resp.body)
     end
     
     def get_order_status key
-      resp = @client.get "orders/status/", key.to_query
+      resp = @client.get "orders/status/#{key.to_query}"
       JSON.parse(resp.body)
     end
     
     def step_order key
       raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
 
-      resp = @client.get "orders/trigger-next-event/", key.to_query
+      resp = @client.get "orders/trigger-next-event/#{key.to_query}"
       JSON.parse(resp.body)
     end
         
     def request_log entries
       raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
 
-      resp = @client.get "logs/requests/", {'max' => entries}.to_query
+      resp = @client.get "logs/requests/?#{entries.to_query('max')}"
       JSON.parse(resp.body)
     end
         
     def post_order params
-      resp = @client.post "orders/", params.to_query
+      resp = @client.post "orders/", params#.to_query
       JSON.parse resp.body
     end
 
     def get_products key = nil
-      resp = @client.get "products/", key.to_query
+      resp = @client.get "products/#{key.to_query}"
       JSON.parse(resp.body)
     end
     
@@ -84,7 +84,7 @@ module Ponoko
     end
     
     def delete_product product_key
-      resp = @client.get "products/delete/", product_key.to_query
+      resp = @client.get "products/delete/#{product_key.to_query}"
       JSON.parse(resp.body)
     end
 
@@ -104,25 +104,23 @@ module Ponoko
     end
     
     def destroy_design product_key, design_key
-      resp = @client.post "products/#{product_key.to_query}/delete_design", design_key.to_query
+      resp = @client.post "products/#{product_key.to_query}/delete_design", design_key#.to_query
       JSON.parse(resp.body)
     end
     
     def post_design_image product_key, image_params
-      # products/3c479d62f2dae6e703861e50d4271efc/design_images
-      # design_images[][uploaded_data]
-      # design_images[][default]
       resp = @client.post "products/#{product_key.to_query}/design_images/", image_params, :multipart
       JSON.parse(resp.body)      
     end
     
     def get_design_image product_key, filename
-      resp = @client.get "products/#{product_key.to_query}/design_images/download", filename.to_query("filename")
+      resp = @client.get "products/#{product_key.to_query}/design_images/download?#{filename.to_query("filename")}"
       resp.body
     end
     
     def destroy_design_image product_key, filename
-      resp = @client.post "products/#{product_key.to_query}/design_images/destroy", filename.to_query("filename")
+#       resp = @client.post "products/#{product_key.to_query}/design_images/destroy", filename.to_query("filename")
+      resp = @client.post "products/#{product_key.to_query}/design_images/destroy", {"filename" => filename}
       resp.body
     end
     
@@ -132,37 +130,39 @@ module Ponoko
     end
     
     def post_assembly_instructions_url product_key, params
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params.to_query
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params#.to_query
       JSON.parse(resp.body)      
     end
     
     def get_assembly_instructions product_key, filename
-      resp = @client.get "products/#{product_key.to_query}/assembly_instructions/download", filename.to_query("filename")
+      resp = @client.get "products/#{product_key.to_query}/assembly_instructions/download?#{filename.to_query("filename")}"
       resp.body
     end
     
     def destroy_assembly_instructions product_key, filename
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", filename.to_query("filename")
+#       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", filename.to_query("filename")
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"filename" => filename}
       JSON.parse(resp.body)      
     end
     
     def destroy_assembly_instructions_url product_key, url
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", url.to_query("url")
+#       resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", url.to_query("url")
+      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"url" => url}
       JSON.parse(resp.body)      
     end
     
     def post_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params.to_query
+      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params#.to_query
       JSON.parse(resp.body)      
     end
     
     def update_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware/update", hardware_params.to_query
+      resp = @client.post "products/#{product_key.to_query}/hardware/update", hardware_params#.to_query
       JSON.parse(resp.body)      
     end
     
     def destroy_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware/destroy", hardware_params.to_query
+      resp = @client.post "products/#{product_key.to_query}/hardware/destroy", hardware_params#.to_query
       JSON.parse(resp.body)      
     end
   end
@@ -185,8 +185,8 @@ module Ponoko
       @access = OAuth::AccessToken.from_hash(consumer, access_keys)
     end
     
-    def get path, params = nil
-      @access.get PONOKO_API_PATH + path + params
+    def get path
+      @access.get PONOKO_API_PATH + path
     end
     
     def post path, params, multipart = false
@@ -199,7 +199,7 @@ module Ponoko
                   "--#{boundary}--\r\n"
       else
         headers = ""
-        query = params.to_query
+        query = params
       end
             
       @access.post PONOKO_API_PATH + path, query, headers
@@ -244,8 +244,13 @@ module Ponoko
       super self, params[:env]
     end
   
-    def get path, params = nil
-      command = PONOKO_API_PATH + path + params + '?' + @auth_params.to_query
+    def get path
+      command = PONOKO_API_PATH + path + if path.include? '?'
+                  '&'
+                else      
+                  '?'
+                end + @auth_params.to_query
+      
       p command if @debug
       
       http = Net::HTTP.new(@base_uri.host, @base_uri.port)
@@ -266,8 +271,7 @@ module Ponoko
       command = PONOKO_API_PATH + path
       p command if @debug
       p params if @debug
-      
-      
+
       http = Net::HTTP.new(@base_uri.host, @base_uri.port)
       request = Net::HTTP::Post.new(command)
 
@@ -284,7 +288,7 @@ module Ponoko
                          @auth_params.merge(params).to_multipart.join('--' + boundary + "\r\n") + 
                          "--#{boundary}--\r\n"
       else
-        request.body = @auth_params.merge(params).to_query
+        request.body = [@auth_params.to_query, params.to_query] * '&'
       end
       
       p request.body if @debug
