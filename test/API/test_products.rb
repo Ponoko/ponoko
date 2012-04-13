@@ -76,6 +76,14 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     
   end
   
+  def test_delete_product
+    @test_auth.expect :post, @api_responses[:product_delete], ['products/delete/2413']
+
+    @ponoko.delete_product "2413"
+
+    @test_auth.verify
+  end
+  
   def test_add_design
     @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/add_design", {}, :multipart]
     resp = @ponoko.post_design "2413", {}
@@ -104,12 +112,12 @@ class TestAPIProducts < MiniTest::Unit::TestCase
     image_file_default = File.new(File.dirname(__FILE__) + "/../fixtures/lamp-1_product_page.jpg")
     image_file = File.new(File.dirname(__FILE__) + "/../fixtures/3d-1_product_page.jpg")
 
-    @test_auth.expect :post, @api_responses[:post_product_200], ['products/2413/design_images/', {'uploaded_data' => image_file_default, 'default' => true}, :multipart]
-    @test_auth.expect :post, @api_responses[:post_product_200], ['products/2413/design_images/', {'uploaded_data' => image_file}, :multipart]
+    @test_auth.expect :post, @api_responses[:post_product_200], ['products/2413/design_images/', {'design_images' => [{'uploaded_data' => image_file_default, 'default' => true}]}, :multipart]
+    @test_auth.expect :post, @api_responses[:post_product_200], ['products/2413/design_images/', {'design_images' => [{'uploaded_data' => image_file}]}, :multipart]
 
 
-    resp = @ponoko.post_design_image "2413", {'uploaded_data' => image_file_default, 'default' => true}
-    resp = @ponoko.post_design_image "2413", {'uploaded_data' => image_file}
+    resp = @ponoko.post_design_image "2413", {'design_images' => [{'uploaded_data' => image_file_default, 'default' => true}]}
+    resp = @ponoko.post_design_image "2413", {'design_images' => [{'uploaded_data' => image_file}]}
 
     @test_auth.verify
   end
@@ -129,15 +137,15 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   
   def test_add_assembly_instructions_file
     file = File.new(File.dirname(__FILE__) + "/../fixtures/instructions.txt")
-    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", {'uploaded_data' => file}, :multipart]
-    resp = @ponoko.post_assembly_instructions_file "2413", 'uploaded_data' => file
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", {'assembly_instructions' => [{'uploaded_data' => file}]}, :multipart]
+    resp = @ponoko.post_assembly_instructions_file "2413", {'assembly_instructions' => [{'uploaded_data' => file}]}
     @test_auth.verify
   end
   
   def test_add_assembly_instructions_url
     url = 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
-    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", {"file_url" => url}]
-    resp = @ponoko.post_assembly_instructions_url '2413', 'file_url' => url
+    @test_auth.expect :post, @api_responses[:post_product_200], ["products/2413/assembly_instructions/", {'assembly_instructions' => [{"file_url" => url}]}]
+    resp = @ponoko.post_assembly_instructions_url '2413', {'assembly_instructions' => [{"file_url" => url}]}
     @test_auth.verify
   end
   
@@ -182,7 +190,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   end
   
   def test_destroy_hardware
-    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware/destroy',{'sku' => 'COM-00680'}]
+    @test_auth.expect :post, @api_responses[:post_product_200],  ['products/2413/hardware/destroy', {'sku' => 'COM-00680'}]
     sku = 'COM-00680' # LED Light Bar - White
     resp = @ponoko.destroy_hardware "2413", 'sku' => sku
     @test_auth.verify
