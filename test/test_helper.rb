@@ -15,8 +15,8 @@ FakeHTTPResponse = Struct.new(:code, :body)
 class MiniTest::Unit::TestCase
   def load_test_resp
     @api_responses = {
-      :ponoko_404   => FakeHTTPResponse.new('404', "{\"error\":{\"message\":\"Not Found. Unknown key\",\"request\":{\"key\":\"bogus_key\"}}}"),
-      :ponoko_500   => FakeHTTPResponse.new('500', "{\"error\":{\"request\":{\"product_id\":\"f10ef21ddf0a890eca1a28e36978dd49\",\"uploaded_data\":\"\\u003Cdata\\u003E\",\"default\":\"0\"},\"message\":\"Error. Internal Server Error\"}}"),
+      :ponoko_404         => FakeHTTPResponse.new('404', "{\"error\":{\"message\":\"Not Found. Unknown key\",\"request\":{\"key\":\"bogus_key\"}}}"),
+      :ponoko_500         => FakeHTTPResponse.new('500', "{\"error\":{\"request\":{\"product_id\":\"f10ef21ddf0a890eca1a28e36978dd49\",\"uploaded_data\":\"\\u003Cdata\\u003E\",\"default\":\"0\"},\"message\":\"Error. Internal Server Error\"}}"),
       :nodes_200          => FakeHTTPResponse.new('200', "{\"nodes\": [{\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}]}"),
       :node_200           => FakeHTTPResponse.new('200', "{\"node\": {\"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
       :node_unknown_field => FakeHTTPResponse.new('200', "{\"node\": {\"unknown_field\": \"Unknown field value\", \"key\": \"2413\", \"name\": \"Ponoko - United States\", \"materials_updated_at\": \"2011/01/01 12:00:00 +0000\"}}"),
@@ -56,7 +56,7 @@ class MiniTest::Unit::TestCase
                                                                                                \"making\":\"16.02\",
                                                                                                \"materials\":\"2.84\",
                                                                                                \"currency\":\"USD\"}}]}}"),
-
+      :product_delete             => FakeHTTPResponse.new('200', "{\"product_key\": \"1234\", \"deleted\": true}"),
       :product_missing_design_400 => FakeHTTPResponse.new('400', "{\"error\":{\"message\":\"Bad Request. Product must have a design.\",\"request\":{\"key\":null}}}"),
       :bad_design_400             => FakeHTTPResponse.new('400', "{\"error\":{\"errors\":[{\"error_code\":\"incorrect_red\",
                                                                                            \"type\":\"design_processing\",
