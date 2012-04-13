@@ -59,7 +59,12 @@ class TestNodes < MiniTest::Unit::TestCase
 
     @test_api.verify
     assert_equal 2, catalogue.count
-    assert_equal "Felt", catalogue.materials.first.name
+    felt = catalogue.materials.first
+    assert_equal "Felt", felt.name
+# For v2.3
+#     assert_equal "99", felt.width(:imperial)
+#     assert_equal "99", felt.length(:metric)
+#     assert_equal "99", felt.thickness(:metric)
   end
   
   def test_get_material_catalogue_bang
