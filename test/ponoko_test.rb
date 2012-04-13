@@ -59,14 +59,35 @@ hr "Create Product"
 new_product.send!
 pp new_product
 
+hr "Update Design"
+design = new_product.designs.first
+design.add_material mc['Plastic']['Acrylic']['Blue']['3.0 mm']['P1']
+design.quantity = 3
+
+new_product.update_design! design
+
+pp new_product.designs
+
 hr "Design Image"
 new_product.add_design_image! File.new(File.dirname(__FILE__) + "/Fixtures/lamp-1_product_page.jpg")
+pp new_product.design_images
 
 hr "Assembly Instructions"
 new_product.add_assembly_instructions! 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
+pp new_product.assembly_instructions
 
 hr "Hardware"
 new_product.add_hardware! 'COM-00680', 2
+
+hardware = new_product.hardware.first
+hardware.quantity = 1
+new_product.update_hardware! hardware
+
+pp new_product
+
+new_product.remove_design_image! 'lamp-1_product_page.jpg'
+new_product.remove_assembly_instructions! 'http://www.instructables.com/id/3D-print-your-minecraft-avatar/'
+new_product.remove_hardware! 'COM-00680'
 
 pp new_product
 
