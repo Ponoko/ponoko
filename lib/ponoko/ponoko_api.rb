@@ -84,7 +84,7 @@ module Ponoko
     end
     
     def delete_product product_key
-      resp = @client.post "products/delete/#{product_key.to_query}"
+      resp = @client.post "products/delete/#{product_key.to_query}", "" # FIXME Get rid of empty argument
       JSON.parse(resp.body)
     end
 
