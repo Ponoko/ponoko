@@ -71,7 +71,7 @@ class TestAPIOrders < MiniTest::Unit::TestCase
     @test_auth.expect :post, 
                       @api_responses[:make_200], 
                       ['orders/', {'ref' => 'order_ref', 
-                              'products' => {'key' => 'product_key', 'quantity' => '99'}, 
+                              'products' => [{'key' => 'product_key', 'quantity' => '99'}],
                               'shipping_option_code' => 'ups_ground', 
                               "delivery_address"=> {"city"=>"New Orleans",
                                                    "country"=>"United States",
@@ -84,7 +84,7 @@ class TestAPIOrders < MiniTest::Unit::TestCase
                                                    "first_name"=>"William"}}]
 
     resp = @ponoko.post_order({'ref' => 'order_ref', 
-                              'products' => {'key' => 'product_key', 'quantity' => '99'}, 
+                              'products' => [{'key' => 'product_key', 'quantity' => '99'}],
                               'shipping_option_code' => 'ups_ground', 
                               "delivery_address"=> {"city"=>"New Orleans",
                                                    "country"=>"United States",
