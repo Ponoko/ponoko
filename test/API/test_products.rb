@@ -77,7 +77,7 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   end
   
   def test_delete_product
-    @test_auth.expect :post, @api_responses[:product_delete], ['products/delete/2413']
+    @test_auth.expect :post, @api_responses[:product_delete], ['products/delete/2413', {}]
 
     @ponoko.delete_product "2413"
 
