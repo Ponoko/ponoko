@@ -147,11 +147,11 @@ class TestProducts < MiniTest::Unit::TestCase
   end
   
   def test_update_a_design
-    assert false
+   assert false
   end
   
   def test_remove_a_design
-    assert false
+   assert false
   end
   
   def test_add_image_bang
@@ -201,7 +201,7 @@ class TestProducts < MiniTest::Unit::TestCase
   end
   
   def test_remove_design_image
-    assert false
+   assert false
   end
   
   def test_add_assembly_instructions_file
@@ -253,7 +253,7 @@ class TestProducts < MiniTest::Unit::TestCase
   end
   
   def test_remove_assembly_instructions
-    assert false
+   assert false
   end
   
   def test_add_hardware_bang
@@ -295,7 +295,7 @@ class TestProducts < MiniTest::Unit::TestCase
     product.key = nil
 
     hardware = product.hardware.first
-    p hardware
+
     hardware.quantity = 99
     product.update_hardware! hardware
 
