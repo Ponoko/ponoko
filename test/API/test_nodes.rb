@@ -10,7 +10,7 @@ class TestAPINodes < MiniTest::Unit::TestCase
   end
 
   def test_api_get_node_list
-    @test_auth.expect(:get, @api_responses[:nodes_200], ['nodes/', ""])
+    @test_auth.expect(:get, @api_responses[:nodes_200], ['nodes/'])
 
     resp = @ponoko.get_nodes
     
@@ -20,7 +20,7 @@ class TestAPINodes < MiniTest::Unit::TestCase
   end
   
   def test_api_get_node_404
-    @test_auth.expect(:get, @api_responses[:ponoko_404], ['nodes/', 'bogus_key'])
+    @test_auth.expect(:get, @api_responses[:ponoko_404], ['nodes/bogus_key'])
 
     resp = @ponoko.get_nodes "bogus_key"
 
@@ -29,7 +29,7 @@ class TestAPINodes < MiniTest::Unit::TestCase
   end
   
   def test_api_get_node
-    @test_auth.expect(:get, @api_responses[:node_200], ['nodes/', '2413'])
+    @test_auth.expect(:get, @api_responses[:node_200], ['nodes/2413'])
 
     resp = @ponoko.get_nodes "2413"
 
@@ -39,7 +39,8 @@ class TestAPINodes < MiniTest::Unit::TestCase
   end
   
   def test_api_get_material_cataloge_fail
-    @test_auth.expect(:get, @api_responses[:ponoko_404], ["nodes/material-catalog/", "bogus_key"])
+    @test_auth.expect(:get, @api_responses[:ponoko_404], ["nodes/material-catalog/bogus_key"])
+#     @test_auth.expect(:get, @api_responses[:ponoko_404], ["nodes/bogus_key/material-catalog"])
 
     resp = @ponoko.get_material_catalogue 'bogus_key'
     
@@ -48,7 +49,8 @@ class TestAPINodes < MiniTest::Unit::TestCase
   end
   
   def test_api_get_material_cataloge
-    @test_auth.expect(:get, @api_responses[:mat_cat_200], ["nodes/material-catalog/", "2413"])
+    @test_auth.expect(:get, @api_responses[:mat_cat_200], ["nodes/material-catalog/2413"])
+#     @test_auth.expect(:get, @api_responses[:mat_cat_200], ["nodes/2413/material-catalog"])
 
     materials = @ponoko.get_material_catalogue '2413'
 

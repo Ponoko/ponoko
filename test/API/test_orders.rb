@@ -9,7 +9,7 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   end
 
   def test_api_get_order_list
-    @test_auth.expect(:get, @api_responses[:orders_200], ['orders/', ""])
+    @test_auth.expect :get, @api_responses[:orders_200], ['orders/']
 
     resp = @ponoko.get_orders
     
@@ -21,7 +21,7 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   end
   
   def test_api_get_order_404
-    @test_auth.expect(:get, @api_responses[:ponoko_404], ['orders/', 'bogus_key'])
+    @test_auth.expect :get, @api_responses[:ponoko_404], ['orders/bogus_key']
 
     resp = @ponoko.get_orders "bogus_key"
     
@@ -31,7 +31,7 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   end
   
   def test_api_get_order
-    @test_auth.expect(:get, @api_responses[:order_200], ['orders/', '2413'])
+    @test_auth.expect :get, @api_responses[:order_200], ['orders/2413']
 
     resp = @ponoko.get_orders "2413"
 
@@ -44,9 +44,9 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   end
   
   def test_shipping_options
-    @test_auth.expect(:get, 
-                     @api_responses[:shipping_200], 
-                     ["orders/shipping_options?", "products[][key]=1234&products[][quantity]=1&products[][key]=abcdef&products[][quantity]=99&delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[state]=na&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"])
+    @test_auth.expect :get, 
+                      @api_responses[:shipping_200], 
+                      ["orders/shipping_options?products[][key]=1234&products[][quantity]=1&products[][key]=abcdef&products[][quantity]=99&delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[state]=na&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"]
                      
     resp = @ponoko.get_shipping_options({'products' => [{'key' => '1234', 'quantity' => '1'}, {'key' => 'abcdef', 'quantity' => '99'}],
                                          'delivery_address' => {'address_line_1' => '27 Dixon Street', 'address_line_2' => 'Te Aro', 'city' => 'Wellington', 'state' => 'na', 'zip_or_postal_code' => '6021', 'country' => 'New Zealand'}})
@@ -59,19 +59,32 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   end
   
   def test_shipping_options_fail
-    @test_auth.expect(:get, 
-                     @api_responses[:ponoko_404],
-                     ["orders/shipping_options?", "delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"])
+    @test_auth.expect :get, 
+                      @api_responses[:ponoko_404],
+                      ["orders/shipping_options?delivery_address[address_line_1]=27%20Dixon%20Street&delivery_address[address_line_2]=Te%20Aro&delivery_address[city]=Wellington&delivery_address[zip_or_postal_code]=6021&delivery_address[country]=New%20Zealand"]
 
     resp = @ponoko.get_shipping_options({'delivery_address' => {'address_line_1' => '27 Dixon Street', 'address_line_2' => 'Te Aro', 'city' => 'Wellington', 'zip_or_postal_code' => '6021', 'country' => 'New Zealand'}})
     assert_equal 'error', resp.keys.first
   end
   
   def test_make_an_order
-    @test_auth.expect(:post, @api_responses[:make_200], ['orders/', "ref=order_ref&products[key]=product_key&products[quantity]=99&shipping_option_code=ups_ground&delivery_address[city]=New%20Orleans&delivery_address[country]=United%20States&delivery_address[phone_number]=504-680-4418&delivery_address[address_line_1]=643%20Magazine%20St.,%20Suite%20405&delivery_address[zip_or_postal_code]=70130&delivery_address[address_line_2]=&delivery_address[last_name]=Reily&delivery_address[state]=LA&delivery_address[first_name]=William"])
+    @test_auth.expect :post, 
+                      @api_responses[:make_200], 
+                      ['orders/', {'ref' => 'order_ref', 
+                              'products' => [{'key' => 'product_key', 'quantity' => '99'}],
+                              'shipping_option_code' => 'ups_ground', 
+                              "delivery_address"=> {"city"=>"New Orleans",
+                                                   "country"=>"United States",
+                                                   "phone_number"=>"504-680-4418",
+                                                   "address_line_1"=>"643 Magazine St., Suite 405",
+                                                   "zip_or_postal_code"=>"70130",
+                                                   "address_line_2"=>"",
+                                                   "last_name"=>"Reily",
+                                                   "state"=>"LA",
+                                                   "first_name"=>"William"}}]
 
     resp = @ponoko.post_order({'ref' => 'order_ref', 
-                              'products' => {'key' => 'product_key', 'quantity' => '99'}, 
+                              'products' => [{'key' => 'product_key', 'quantity' => '99'}],
                               'shipping_option_code' => 'ups_ground', 
                               "delivery_address"=> {"city"=>"New Orleans",
                                                    "country"=>"United States",
@@ -93,7 +106,7 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   end
   
   def test_bump_order_state
-    @test_auth.expect(:get, @api_responses[:order_200], ['orders/trigger-next-event/', 'order_key'])
+    @test_auth.expect :get, @api_responses[:order_200], ['orders/trigger-next-event/order_key']
 
     resp = @ponoko.step_order 'order_key'
 
@@ -118,7 +131,7 @@ class TestAPIOrders < MiniTest::Unit::TestCase
   end
   
   def test_order_status
-    @test_auth.expect(:get, @api_responses[:status], ['orders/status/', 'order_key'])
+    @test_auth.expect :get, @api_responses[:status], ['orders/status/order_key']
 
     resp = @ponoko.get_order_status 'order_key'
     

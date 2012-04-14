@@ -42,30 +42,28 @@ module Ponoko
     end
 
     def self.get! key = nil
-      resp = with_handle_error { Ponoko::api.send "get_#{ponoko_objects}", key }
-
-      if key.nil?
+      resp = Ponoko::api.send "get_#{ponoko_objects}", key
+      
+      if resp['error']
+        Error.new(resp['error'])
+      elsif key.nil?
         resp[ponoko_objects].collect do |p| # FIXME fetch
           new(p)
         end
       else
         new resp[ponoko_object] # FIXME fetch
       end
+
+    rescue JSON::ParserError
+      fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'"  # FIXME resp will always be nil
     end
     
     def update!
       with_handle_error { Ponoko::api.send "get_#{self.class.ponoko_objects}", key }
     end
     
-    def self.with_handle_error
-      resp = yield.tap {|resp| throw :error, Error.new(resp['error']) if resp['error'] }
-
-    rescue JSON::ParserError
-      fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'"  # FIXME resp will always be nil
-    end
-    
     def with_handle_error
-#       @error = nil;
+      @error = nil;
       resp = yield
       
       if resp.is_a? Hash
@@ -91,7 +89,6 @@ module Ponoko
   end
   
   class Product < Base
-
     attr_accessor :name, :description, :materials_available, :node_key
     attr_reader   :designs, :design_images, :assembly_instructions, :hardware, :urls
     attr_writer   :locked, :total_make_cost
@@ -135,7 +132,21 @@ module Ponoko
       end
     end
     
-    def add_designs *designs # quantity?
+    def assembly_instructions= ass
+      @assembly_instructions.clear
+      ass.each do |a|
+        @assembly_instructions << AssemblyInstruction.new(a)
+      end
+    end
+
+    def design_images= di
+      @design_images.clear
+      di.each do |d|
+        @design_images << DesignImage.new(d)
+      end
+    end
+        
+    def add_designs *designs
       designs.each do |d|
         @designs << d
       end
@@ -154,7 +165,7 @@ module Ponoko
       if key.nil? # product hasn't been 'saved' to Ponoko yet.
         fail Ponoko::PonokoAPIError, "Design Images can only be added to Products on the server." 
       else
-        with_handle_error { Ponoko::api.post_design_image self.key, {'uploaded_data' => file, 'default' => default} }
+        with_handle_error { Ponoko::api.post_design_image self.key, {'design_images' => [{'uploaded_data' => file, 'default' => default}]} }
       end
     end
     
@@ -167,9 +178,9 @@ module Ponoko
         fail Ponoko::PonokoAPIError, "Assembly Instructions can only be added to Products on the server." 
       else
         if file_or_url.is_a? File
-          with_handle_error { Ponoko::api.post_assembly_instructions_file self.key, {'uploaded_data' => file_or_url} }
+          with_handle_error { Ponoko::api.post_assembly_instructions_file self.key, {'assembly_instructions' => [{'uploaded_data' => file_or_url}]} }
         else
-          with_handle_error { Ponoko::api.post_assembly_instructions_url self.key, {'file_url' => file_or_url} }
+          with_handle_error { Ponoko::api.post_assembly_instructions_url self.key, {'assembly_instructions' => [{'file_url' => file_or_url}]} }
         end
       end
     end
@@ -191,6 +202,23 @@ module Ponoko
       end
     end
 
+    def update_hardware! hardware
+      if key.nil? # product hasn't been 'saved' to Ponoko yet.
+        h = @hardware.detect {|h| h.sku = hardware.sku}
+        h.quantity = hardware.quantity
+      else
+        with_handle_error { Ponoko::api.update_hardware self.key, {'sku' => hardware.sku, 'quantity' => hardware.quantity} }      
+      end
+    end
+    
+    def remove_hardware! hardware
+      if key.nil? # product hasn't been 'saved' to Ponoko yet.
+        @hardware.reject {|h| h.sku = hardware.sku}
+      else
+        with_handle_error { Ponoko::api.destroy_hardware self.key, hardware.sku }
+      end
+    end
+    
     def to_params
       fail Ponoko::PonokoAPIError, "Product must have a Design." if @designs.empty?
       {'ref' => ref, 'name' => name, 'description' => description, 'designs' => @designs.to_params}
@@ -216,7 +244,8 @@ module Ponoko
   
   class Design < Base
 
-    attr_accessor :material_key, :design_file, :filename, :size, :quantity, :content_type, :units
+    attr_accessor :material_key, :design_file, :filename, :size, :quantity, :units
+    attr_accessor :content_type
     attr_reader   :material, :bounding_box, :volume
 
     attr_writer   :make_cost
@@ -269,6 +298,19 @@ module Ponoko
     end
   end
   
+  class DesignImage < Base
+    attr_accessor :filename, :default
+    
+    def initialize params = {}
+      @default ||= false
+      super
+    end
+  end
+  
+  class AssemblyInstruction < Base
+    attr_accessor :file_url, :filename
+  end
+
   class Address < Hash; end
     
   class Order < Base
@@ -323,12 +365,19 @@ module Ponoko
     
     def status!
       with_handle_error { Ponoko::api.get_order_status key }
-      status
+      if @error.nil?
+        @events.last['name'] # FIXME fetch
+      else
+        @error
+      end
     end
     
     def status
-      status! if @events.empty?
-      @events.last['name'] # FIXME fetch
+      if @events.empty?
+        status!
+      else
+        @events.last['name'] # FIXME fetch
+      end
     end
     
     def shipping_options!
@@ -364,15 +413,17 @@ module Ponoko
     
     def material_catalogue!
       materials_date = materials_updated_at
-      update! # update self from server
+      # update self from server to get material catalogue update time.
+      update! # FIXME test for error
 
       if @material_catalogue.nil? or materials_updated_at > materials_date
-        resp = Ponoko::api.get_material_catalogue key
-        fail Ponoko::PonokoAPIError, "Unknown Error Occurred" unless key == resp['key']
-        update resp
+        resp = with_handle_error { Ponoko::api.get_material_catalogue key }
+        if resp.is_a?(Hash) && key == resp['key']
+          update resp
+        end
       end
       
-      material_catalogue
+      @material_catalogue
     end
 
     def material_catalogue
@@ -425,4 +476,3 @@ module Ponoko
   end
   
 end # module Ponoko  
-  
