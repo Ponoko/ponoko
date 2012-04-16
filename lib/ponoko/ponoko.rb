@@ -369,7 +369,11 @@ module Ponoko
     def shipping_options!
       fail Ponoko::PonokoAPIError, "Order must have a Delivery Address" if delivery_address.nil?
       resp = with_handle_error { Ponoko::api.get_shipping_options self.to_params }
-      resp['shipping_options']['options'] # FIXME fetch
+      if @error.nil?
+        resp['shipping_options']['options'] # FIXME fetch
+      else
+        @error
+      end
     end
     
     def to_params
