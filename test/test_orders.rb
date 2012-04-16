@@ -79,6 +79,29 @@ class TestOrders < MiniTest::Unit::TestCase
     assert_equal "Order must have a Delivery Address", e.message
   end
   
+  def test_shipping_options_fail
+    @test_api.expect(:get_shipping_options, 
+                      @api_responses[:shipping_options_error],
+                      [{'ref' => 'order_ref', 
+                        'products' => [{'key' => '1234', 'quantity' => "1"},{'key' => 'abcdef', 'quantity' => "99"}], 
+                        'delivery_address' => {'first_name' => 'John', 'last_name' => 'Brown', 'address_line_1' => '27 Dixon Street', 'address_line_2' => 'Te Aro', 'city' => 'Wellington', 'state' => 'na', 'zip_or_postal_code' => '6021', 'country' => 'New Zealand', "phone_number" => "045678910"}}])
+
+  
+    product1 = Ponoko::Product.new 'key' => '1234'
+    product2 = Ponoko::Product.new 'key' => 'abcdef'
+    order = Ponoko::Order.new 'ref' => "order_ref"
+    
+    order.add_product product1, 1
+    order.add_product product2, 99
+    
+    order.delivery_address = {"first_name" => "John", "last_name" => "Brown", "address_line_1"=>"27 Dixon Street", "address_line_2"=>"Te Aro", "city"=>"Wellington", "state"=>"na", "zip_or_postal_code"=>"6021", "country"=>"New Zealand", "phone_number" => "045678910"}
+
+    error = order.shipping_options!
+  
+    @test_api.verify
+    assert error.is_a? Ponoko::Error
+  end
+  
   def test_make_an_order_with_no_params
     order = Ponoko::Order.new
     

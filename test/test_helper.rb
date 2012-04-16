@@ -141,7 +141,8 @@ class MiniTest::Unit::TestCase
                                                                                                \"materials\":\"2.84\",
                                                                                                \"currency\":\"USD\"}}]}}"),
 
-      :ponoko_exception   => FakeHTTPResponse.new('500', "<html>Exceptions return HTML</html>")
+      :ponoko_exception   => FakeHTTPResponse.new('500', "<html>Exceptions return HTML</html>"),
+      :shipping_options_error => {"error"=>{"message"=>"Bad Request. There was nothing to be made for at least one of the products, check that your designs have material_keys set", "request"=>{"delivery_address"=>{"city"=>"Wellington", "country"=>"New Zealand", "phone_number"=>"045678910", "address_line_1"=>"27 Dixon Street", "zip_or_postal_code"=>"6021", "address_line_2"=>"Te Aro", "last_name"=>"Brown", "state"=>"na", "first_name"=>"John"}, "products"=>[{"quantity"=>"1", "key"=>"a23e6586a9d7ed782ea3a709803f63b3"}], "ref"=>"order_ref97-2012-04-16 15:29:38  1200"}}}
     }
   end
   
