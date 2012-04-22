@@ -206,21 +206,23 @@ class TestAPIProducts < MiniTest::Unit::TestCase
   def test_server_exception
     @test_auth.expect :get, @api_responses[:ponoko_exception], ['products/']
 
-    assert_raises JSON::ParserError do
-      resp = @ponoko.get_products
+    e = assert_raises Ponoko::PonokoAPIError do
+      @ponoko.get_products
     end    
 
     @test_auth.verify
+    assert e.message.include? "Ponoko returned an invalid response"
   end
   
   def test_internal_server_error
     @test_auth.expect :get, @api_responses[:ponoko_500], ['products/']
 
-    assert_raises JSON::ParserError do
-      resp = @ponoko.get_products
+    e = assert_raises Ponoko::PonokoAPIError do
+      @ponoko.get_products
     end    
 
     @test_auth.verify
+    assert e.message.include? "Ponoko returned an invalid response"
   end
   
 end

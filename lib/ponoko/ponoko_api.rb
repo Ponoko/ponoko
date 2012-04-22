@@ -8,6 +8,7 @@ module Ponoko
   class PonokoAPIError < StandardError; end
   
   class PonokoAPI
+    attr_writer :base_uri
     attr :debug
     
     PONOKO_API_PATH = '/services/api/v2/'
@@ -26,91 +27,79 @@ module Ponoko
     end
     
     def make_request
-      yield.tap {|resp| fail PonokoAPIError, "Ponoko returned an invalid response; '#{resp}'" if resp.code.to_i > 499 }
+      resp = yield.tap {|resp| fail PonokoAPIError, "Ponoko returned an invalid response; #{resp.code} '#{resp.body}'" if resp.code.to_i > 499 }
+      JSON.parse(resp.body)   
+
+    rescue JSON::ParserError
+      fail PonokoAPIError, "Ponoko returned an invalid response; #{resp.code} '#{resp.body}'"
     end
     
     def get_nodes node_key = nil
-      resp = @client.get "nodes/#{node_key.to_query}"
-      JSON.parse(resp.body)
+      make_request { @client.get "nodes/#{node_key.to_query}" }
     end
     
     def get_material_catalogue node_key
-      resp = @client.get "nodes/material-catalog/#{node_key.to_query}"
-      JSON.parse(resp.body)
+      make_request { @client.get "nodes/material-catalog/#{node_key.to_query}" }
     end
     
     def get_orders key = nil
-      resp = @client.get "orders/#{key.to_query}"
-      JSON.parse(resp.body)
+      make_request { @client.get "orders/#{key.to_query}" }
     end
     
     def get_shipping_options params
-      resp = @client.get "orders/shipping_options?#{params.to_query}"
-      JSON.parse(resp.body)
+      make_request { @client.get "orders/shipping_options?#{params.to_query}" }
     end
     
     def get_order_status key
-      resp = @client.get "orders/status/#{key.to_query}"
-      JSON.parse(resp.body)
+      make_request { @client.get "orders/status/#{key.to_query}" }
     end
     
     def step_order key
       raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
 
-      resp = @client.get "orders/trigger-next-event/#{key.to_query}"
-      JSON.parse(resp.body)
+      make_request { @client.get "orders/trigger-next-event/#{key.to_query}" }
     end
         
     def request_log entries
       raise Ponoko::PonokoAPIError, "Ponoko API Sandbox only" unless @base_uri.host =~ /sandbox/
 
-      resp = @client.get "logs/requests/?#{entries.to_query('max')}"
-      JSON.parse(resp.body)
+      make_request { @client.get "logs/requests/?#{entries.to_query('max')}" }
     end
         
     def post_order params
-      resp = @client.post "orders/", params
-      JSON.parse resp.body
+      make_request { @client.post "orders/", params }
     end
 
     def get_products key = nil
-      resp = @client.get "products/#{key.to_query}"
-      JSON.parse(resp.body)
+      make_request { @client.get "products/#{key.to_query}" }
     end
     
     def post_product params
-      resp = @client.post "products", params, :multipart
-      JSON.parse(resp.body)      
+      make_request { @client.post "products", params, :multipart }
     end
     
     def delete_product product_key
-      resp = @client.post "products/delete/#{product_key.to_query}", {} # FIXME Get rid of empty argument
-      JSON.parse(resp.body)
+      make_request { @client.post "products/delete/#{product_key.to_query}", {} } # FIXME Get rid of empty argument
     end
 
     def post_design product_key, params
-      resp = @client.post "products/#{product_key.to_query}/add_design", params, :multipart
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/add_design", params, :multipart }
     end
     
     def update_design product_key, params
-      resp = @client.post "products/#{product_key.to_query}/update_design", params, :multipart
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/update_design", params, :multipart }
     end
     
     def replace_design product_key, params
-      resp = @client.post "products/#{product_key.to_query}/replace_design", params, :multipart
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/replace_design", params, :multipart }
     end
     
     def destroy_design product_key, design_key
-      resp = @client.post "products/#{product_key.to_query}/delete_design", design_key
-      JSON.parse(resp.body)
+      make_request { @client.post "products/#{product_key.to_query}/delete_design", design_key }
     end
     
     def post_design_image product_key, image_params
-      resp = @client.post "products/#{product_key.to_query}/design_images/", image_params, :multipart
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/design_images/", image_params, :multipart }
     end
     
     def get_design_image product_key, filename
@@ -119,18 +108,15 @@ module Ponoko
     end
     
     def destroy_design_image product_key, filename
-      resp = @client.post "products/#{product_key.to_query}/design_images/destroy", {"filename" => filename}
-      resp.body
+      make_request { @client.post "products/#{product_key.to_query}/design_images/destroy", {"filename" => filename} }
     end
     
     def post_assembly_instructions_file product_key, params
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params, :multipart
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/assembly_instructions/", params, :multipart }
     end
     
     def post_assembly_instructions_url product_key, params
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/", params
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/assembly_instructions/", params }
     end
     
     def get_assembly_instructions product_key, filename
@@ -139,28 +125,23 @@ module Ponoko
     end
     
     def destroy_assembly_instructions product_key, filename
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"filename" => filename}
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"filename" => filename} }
     end
     
     def destroy_assembly_instructions_url product_key, url
-      resp = @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"url" => url}
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/assembly_instructions/destroy", {"url" => url} }
     end
     
     def post_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware", hardware_params
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/hardware", hardware_params }
     end
     
     def update_hardware product_key, hardware_params
-      resp = @client.post "products/#{product_key.to_query}/hardware/update", hardware_params
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/hardware/update", hardware_params }
     end
     
     def destroy_hardware product_key, hardware_key
-      resp = @client.post "products/#{product_key.to_query}/hardware/destroy", hardware_key
-      JSON.parse(resp.body)      
+      make_request { @client.post "products/#{product_key.to_query}/hardware/destroy", hardware_key }
     end
   end
     
@@ -249,11 +230,12 @@ module Ponoko
                 end + @auth_params.to_query
       
       p command if @debug
-      
+
       http = Net::HTTP.new(@base_uri.host, @base_uri.port)
       http.use_ssl = true if @base_uri.port == 443
       request = Net::HTTP::Get.new(command)
-      
+      request.basic_auth 'ponoko', 'strangeglove78'
+
       resp = http.request(request)
 
       if @debug
@@ -287,6 +269,8 @@ module Ponoko
       else
         request.body = [@auth_params.to_query, params.to_query] * '&'
       end
+      
+      request.basic_auth 'ponoko', 'strangeglove78'
       
       p request.body if @debug
       
